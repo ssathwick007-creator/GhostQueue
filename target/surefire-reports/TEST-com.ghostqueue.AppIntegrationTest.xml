@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.ghostqueue.AppIntegrationTest" time="0.948" tests="6" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.cpu.isalist" value="amd64"/>
+    <property name="sun.jnu.encoding" value="Cp1252"/>
+    <property name="java.class.path" value="C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue\target\test-classes;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\com\mysql\mysql-connector-j\9.1.0\mysql-connector-j-9.1.0.jar;C:\Users\S SATHWICK\.m2\repository\com\google\protobuf\protobuf-java\4.26.1\protobuf-java-4.26.1.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;"/>
+    <property name="java.vm.vendor" value="JetBrains s.r.o."/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="user.variant" value=""/>
+    <property name="java.vendor.url" value="https://openjdk.org/"/>
+    <property name="user.timezone" value="Asia/Calcutta"/>
+    <property name="os.name" value="Windows 11"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="user.country" value="IN"/>
+    <property name="sun.boot.library.path" value="C:\Program Files\Android\Android Studio\jbr\bin"/>
+    <property name="sun.java.command" value="org.apache.maven.surefire.booter.ForkedBooter C:\Users\S SATHWICK\AppData\Local\Temp\surefire3231792846845165574 2026-11-17T16-58-04_180-jvmRun1 surefire-20261117165806396_1tmp surefire_0-20261117165806396_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue\target\test-classes;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\com\mysql\mysql-connector-j\9.1.0\mysql-connector-j-9.1.0.jar;C:\Users\S SATHWICK\.m2\repository\com\google\protobuf\protobuf-java\4.26.1\protobuf-java-4.26.1.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="C:\Users\S SATHWICK"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="jdk.module.path" value="C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue\target\classes;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2-win.jar"/>
+    <property name="java.version.date" value="2025-07-15"/>
+    <property name="java.home" value="C:\Program Files\Android\Android Studio\jbr"/>
+    <property name="file.separator" value="\"/>
+    <property name="basedir" value="C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="intellij.os.virtualization" value="none"/>
+    <property name="jbr.virtualization.information" value="Hyper-V role"/>
+    <property name="surefire.real.class.path" value="C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-booter\3.2.5\surefire-booter-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-api\3.2.5\surefire-api-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-extensions-spi\3.2.5\surefire-extensions-spi-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-logger-api\3.2.5\surefire-logger-api-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-shared-utils\3.2.5\surefire-shared-utils-3.2.5.jar;C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue\target\test-classes;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2.jar;C:\Users\S SATHWICK\.m2\repository\com\mysql\mysql-connector-j\9.1.0\mysql-connector-j-9.1.0.jar;C:\Users\S SATHWICK\.m2\repository\com\google\protobuf\protobuf-java\4.26.1\protobuf-java-4.26.1.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter\5.10.2\junit-jupiter-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-api\5.10.2\junit-jupiter-api-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\opentest4j\opentest4j\1.3.0\opentest4j-1.3.0.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-commons\1.10.2\junit-platform-commons-1.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\apiguardian\apiguardian-api\1.1.2\apiguardian-api-1.1.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-params\5.10.2\junit-jupiter-params-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\jupiter\junit-jupiter-engine\5.10.2\junit-jupiter-engine-5.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-engine\1.10.2\junit-platform-engine-1.10.2.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\surefire-junit-platform\3.2.5\surefire-junit-platform-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\apache\maven\surefire\common-java5\3.2.5\common-java5-3.2.5.jar;C:\Users\S SATHWICK\.m2\repository\org\junit\platform\junit-platform-launcher\1.10.2\junit-platform-launcher-1.10.2.jar"/>
+    <property name="user.script" value=""/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.8+-14196175-b1038.72"/>
+    <property name="user.name" value="S SATHWICK"/>
+    <property name="stdout.encoding" value="Cp1252"/>
+    <property name="path.separator" value=";"/>
+    <property name="os.version" value="10.0"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="skipTests" value="false"/>
+    <property name="localRepository" value="C:\Users\S SATHWICK\.m2\repository"/>
+    <property name="java.vendor.url.bug" value="https://bugreport.java.com/bugreport/"/>
+    <property name="java.io.tmpdir" value="C:\Users\SSATHW~1\AppData\Local\Temp\"/>
+    <property name="java.version" value="21.0.8"/>
+    <property name="user.dir" value="C:\Users\S SATHWICK\Desktop\College\PROGRAMMING IN JAVA\GhostQueue"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="sun.os.patch.level" value=""/>
+    <property name="native.encoding" value="Cp1252"/>
+    <property name="java.library.path" value="C:\Program Files\Android\Android Studio\jbr\bin;C:\windows\Sun\Java\bin;C:\windows\system32;C:\windows;C:/Users/S SATHWICK/.gemini/antigravity/bin;C:\Program Files\Common Files\Oracle\Java\javapath;C:\Program Files (x86)\Common Files\Oracle\Java\java8path;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA App\NvDLISR;C:\Users\Administrator\AppData\Local\Microsoft\WindowsApps;C:\Program Files\HP\OMEN-Broadcast\Common;C:\MinGW\bin;C:\MinGW\bin;C:\MinGW\bin;C:\Program Files\Git\cmd;C:\Program Files\nodejs\;C:\Users\S SATHWICK\scoop\shims;C:\tmp\flutter\bin;C:\Users\S SATHWICK\AppData\Local\Programs\Python\Python313\Scripts\;C:\Users\S SATHWICK\AppData\Local\Programs\Python\Python313\;C:\Users\S SATHWICK\AppData\Local\Microsoft\WindowsApps;C:\Users\S SATHWICK\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\S SATHWICK\Downloads;C:\Users\S SATHWICK\AppData\Roaming\npm;C:\Users\S SATHWICK\AppData\Local\GitHubDesktop\bin;C:\Users\S SATHWICK\AppData\Local\Programs\cursor\resources\app\bin;C:\Users\S SATHWICK\AppData\Local\Programs\Antigravity IDE\bin;C:\Users\S SATHWICK\AppData\Local\Kingsoft\WPS Office\12.1.0.27458\clitool;C:\Users\S SATHWICK\AppData\Local\Programs\Ollama;C:\Users\S SATHWICK\AppData\Local\Programs\DockerDesktop\resources\bin;C:\Users\S SATHWICK\AppData\Local\Programs\Microsoft VS Code\bin\copilot-shim;."/>
+    <property name="java.vm.info" value="mixed mode"/>
+    <property name="stderr.encoding" value="Cp1252"/>
+    <property name="java.vendor" value="JetBrains s.r.o."/>
+    <property name="java.vm.version" value="21.0.8+-14196175-b1038.72"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+  </properties>
+  <testcase name="testDoctorService" classname="com.ghostqueue.AppIntegrationTest" time="0.486">
+    <system-err><![CDATA[Nov 17, 2026 4:58:07 PM com.ghostqueue.service.ServiceRegistry <init>
+INFO: Initializing GhostQueue ServiceRegistry with JDBC repositories...
+Nov 17, 2026 4:58:07 PM com.ghostqueue.util.DatabaseInitializer initializeDatabase
+INFO: Verifying GhostQueue MySQL database initialization...
+Nov 17, 2026 4:58:07 PM com.ghostqueue.util.DatabaseConnection loadConfiguration
+INFO: Database configuration loaded. Target URL: jdbc:mysql://localhost:3306/ghostqueue_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8 (User: root)
+Nov 17, 2026 4:58:07 PM com.ghostqueue.util.DatabaseInitializer initializeDatabase
+INFO: GhostQueue database tables already exist and are active.
+Nov 17, 2026 4:58:07 PM com.ghostqueue.service.ServiceRegistry <init>
+INFO: GhostQueue ServiceRegistry initialized successfully with active MySQL database integration.
+Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcDoctorRepository updateAvailability
+INFO: Updated availability for doctor DOC-101 to AVAILABLE
+]]></system-err>
+  </testcase>
+  <testcase name="testQueueService" classname="com.ghostqueue.AppIntegrationTest" time="0.115">
+    <system-err><![CDATA[Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcQueueRepository save
+INFO: Saved queue entry: WQ-TEST-8066
+Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcQueueRepository updateStatus
+INFO: Updated queue status for WQ-TEST-8066 to OFFERED
+Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcQueueRepository delete
+INFO: Deleted queue entry: WQ-TEST-8066
+]]></system-err>
+  </testcase>
+  <testcase name="testResourcesExist" classname="com.ghostqueue.AppIntegrationTest" time="0.007"/>
+  <testcase name="testAppointmentBusinessRules" classname="com.ghostqueue.AppIntegrationTest" time="0.158">
+    <system-err><![CDATA[Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcAppointmentRepository saveTransactional
+INFO: Transaction committed: saved appointment APT-VAL-88181
+Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcAppointmentRepository updateStatus
+INFO: Transaction committed: updated status for APT-VAL-88181 to Cancelled
+]]></system-err>
+  </testcase>
+  <testcase name="testLiveAnalytics" classname="com.ghostqueue.AppIntegrationTest" time="0.038"/>
+  <testcase name="testPatientService" classname="com.ghostqueue.AppIntegrationTest" time="0.108">
+    <system-err><![CDATA[Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcPatientRepository save
+INFO: Successfully registered new patient: PT-TEST-8394
+Nov 17, 2026 4:58:08 PM com.ghostqueue.repository.JdbcPatientRepository delete
+INFO: Deleted eligible patient: PT-TEST-8394
+]]></system-err>
+  </testcase>
+</testsuite>

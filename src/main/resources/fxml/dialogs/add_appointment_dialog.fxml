@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox prefWidth="560.0" spacing="16" stylesheets="@../../css/theme.css"
+      style="-fx-background-color: #FFFFFF; -fx-padding: 24px;"
+      xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ghostqueue.controller.AddAppointmentDialogController">
+
+    <!-- Title Header -->
+    <VBox spacing="4">
+        <Label text="Schedule New Patient Appointment" styleClass="card-title" style="-fx-font-size: 17px;" />
+        <Label text="Select registered patient and physician to book clinical slot with conflict validation." styleClass="card-subtitle" />
+    </VBox>
+
+    <GridPane hgap="14" vgap="12">
+        <columnConstraints>
+            <ColumnConstraints minWidth="150" prefWidth="160" />
+            <ColumnConstraints hgrow="ALWAYS" />
+        </columnConstraints>
+
+        <!-- Existing Patient Selection -->
+        <Label text="Select Registered Patient" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+        <ComboBox fx:id="patientSelectCombo" maxWidth="Infinity" promptText="Choose existing patient (or type below)..." GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+        <!-- Patient Name -->
+        <Label text="Patient Full Name *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+        <TextField fx:id="patientNameField" promptText="e.g. Samuel Henderson" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+        <!-- Patient ID -->
+        <Label text="Patient MRN / ID *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+        <TextField fx:id="patientIdField" promptText="e.g. PAT-001" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+        <!-- Phone -->
+        <Label text="Contact Number *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+        <TextField fx:id="phoneField" promptText="e.g. +1 555-014-9988" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+        <!-- Department -->
+        <Label text="Department *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+        <ComboBox fx:id="departmentCombo" maxWidth="Infinity" promptText="Select Clinical Specialty" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+        <!-- Doctor -->
+        <Label text="Attending Doctor *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+        <ComboBox fx:id="doctorCombo" maxWidth="Infinity" promptText="Select Attending Physician" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+        <!-- Date -->
+        <Label text="Appointment Date *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+        <DatePicker fx:id="datePicker" maxWidth="Infinity" promptText="Select Date" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+        <!-- Time -->
+        <Label text="Appointment Time *" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+        <ComboBox fx:id="timeCombo" maxWidth="Infinity" promptText="Select Slot Time" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+        <!-- Reason -->
+        <Label text="Reason / Clinical Note" style="-fx-font-weight: 600;" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+        <TextField fx:id="reasonField" promptText="e.g. Routine Cardiac Follow-up" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+    </GridPane>
+
+    <!-- Feedback notice for conflicts or validation -->
+    <Label fx:id="validationMessageLabel" text="" style="-fx-text-fill: #C95F5F; -fx-font-size: 12px;" wrapText="true" />
+
+    <!-- Button Row -->
+    <HBox alignment="CENTER_RIGHT" spacing="12">
+        <Button onAction="#handleCancel" styleClass="btn-secondary" text="Cancel" />
+        <Button onAction="#handleSave" styleClass="btn-primary" text="Confirm &amp; Schedule" />
+    </HBox>
+</VBox>

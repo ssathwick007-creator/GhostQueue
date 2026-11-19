@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" styleClass="scroll-pane" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ghostqueue.controller.PredictionController">
+    <VBox spacing="18">
+        <!-- PREDICTION ENGINE ADVISORY BANNER -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="banner-notice">
+            <Label text="ℹ" style="-fx-font-size: 16px; -fx-text-fill: #168C83; -fx-font-weight: bold;" />
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label text="INTELLIGENT NO-SHOW PREDICTION ENGINE (LOGISTIC REGRESSION &amp; XAI)"
+                       style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #172A3A;" />
+                <Label text="Estimates appointment non-attendance probability using pre-appointment features, booking intervals, and historical attendance compliance. Explainable factors guide operational interventions."
+                       styleClass="card-subtitle" wrapText="true" />
+            </VBox>
+            <HBox spacing="8" alignment="CENTER_RIGHT">
+                <Button onAction="#handleOpenModelEvaluation" styleClass="btn-secondary" text="📊 Model Evaluation &amp; Metrics" />
+                <Button onAction="#handleRunBatchEvaluation" styleClass="btn-primary" text="⚡ Run Batch Recalibration" />
+            </HBox>
+        </HBox>
+
+        <!-- PREDICTION STAT METRICS -->
+        <GridPane hgap="16" vgap="16">
+            <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="HIGH-RISK APPOINTMENTS" styleClass="stat-label" />
+                <Label fx:id="highRiskCountLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #C95F5F;" />
+                <Label text="Probability ≥ 65% threshold" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="AVERAGE NO-SHOW PROBABILITY" styleClass="stat-label" />
+                <Label fx:id="avgRiskLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
+                <Label text="Hospital-wide scheduled cohort" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="MODEL DISCRIMINATION (ROC-AUC)" styleClass="stat-label" />
+                <Label fx:id="modelConfidenceLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
+                <Label text="Held-out test set benchmark" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="PROJECTED PREVENTED NO-SHOWS" styleClass="stat-label" />
+                <Label fx:id="preventedLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
+                <Label text="Via preemptive triage &amp; reminders" styleClass="stat-subtext" />
+            </VBox>
+        </GridPane>
+
+        <!-- PREDICTION RESULTS TABLE -->
+        <VBox styleClass="card" spacing="14">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2">
+                    <Label text="Predictive Risk Assessment Roster" styleClass="card-title" />
+                    <Label text="Mathematical probability scoring, ranked driving features, and targeted operational actions" styleClass="card-subtitle" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="recordCountLabel" text="Showing 0 predictions" styleClass="card-subtitle" />
+            </HBox>
+
+            <!-- Filter Controls Toolbar -->
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <TextField fx:id="searchField" promptText="Filter by patient name, ID, or doctor..."
+                           styleClass="text-field" prefWidth="230" />
+                <ComboBox fx:id="riskFilter" prefWidth="150" promptText="All Risk Levels" />
+                <ComboBox fx:id="departmentFilter" prefWidth="160" promptText="All Departments" />
+                <ComboBox fx:id="doctorFilter" prefWidth="170" promptText="All Doctors" />
+                <DatePicker fx:id="dateFilter" promptText="Appointment Date" prefWidth="150" />
+                <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Clear Filters" />
+            </HBox>
+
+            <TableView fx:id="predictionTable" prefHeight="460">
+                <columns>
+                    <TableColumn fx:id="colApptId" text="Appt ID" prefWidth="85" />
+                    <TableColumn fx:id="colPatient" text="Patient Name" prefWidth="160" />
+                    <TableColumn fx:id="colDoctor" text="Physician &amp; Dept" prefWidth="160" />
+                    <TableColumn fx:id="colTime" text="Date &amp; Time" prefWidth="130" />
+                    <TableColumn fx:id="colRiskScore" text="No-Show Risk" prefWidth="110" />
+                    <TableColumn fx:id="colRiskLevel" text="Risk Category" prefWidth="125" />
+                    <TableColumn fx:id="colDrivers" text="Primary Contributing Factor" prefWidth="280" />
+                    <TableColumn fx:id="colMethod" text="Model / Method" prefWidth="140" />
+                    <TableColumn fx:id="colAction" text="Clinical Actions" prefWidth="175" />
+                </columns>
+                <placeholder>
+                    <Label text="No prediction records match the selected criteria." styleClass="card-subtitle" />
+                </placeholder>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

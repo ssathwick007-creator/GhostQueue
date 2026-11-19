@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" prefHeight="680.0" prefWidth="640.0" stylesheets="@../../css/theme.css"
+            style="-fx-background-color: #FFFFFF; -fx-padding: 0;"
+            xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ghostqueue.controller.PredictionExplanationDialogController">
+
+    <VBox spacing="18" style="-fx-padding: 24px; -fx-background-color: #FFFFFF;">
+        <!-- Header -->
+        <HBox alignment="CENTER_LEFT" spacing="12">
+            <VBox spacing="3" HBox.hgrow="ALWAYS">
+                <Label fx:id="patientNameLabel" text="Demo Patient" styleClass="card-title" style="-fx-font-size: 19px;" />
+                <Label fx:id="appointmentInfoLabel" text="Appt APT-801 • Dr. Robert Vance • Cardiology" styleClass="card-subtitle" />
+            </VBox>
+            <Label fx:id="riskBadgeLabel" text="HIGH RISK" styleClass="risk-badge, risk-badge-high" style="-fx-font-size: 13px; -fx-padding: 6px 14px;" />
+        </HBox>
+
+        <Separator />
+
+        <!-- PROBABILITY GAUGE CARD -->
+        <VBox spacing="8" style="-fx-background-color: #F5F6F4; -fx-padding: 16px; -fx-background-radius: 8px; -fx-border-color: #E4E9E8; -fx-border-radius: 8px;">
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="PREDICTED NO-SHOW PROBABILITY" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D;" />
+                    <HBox alignment="BASELINE_LEFT" spacing="6">
+                        <Label fx:id="probabilityValueLabel" text="74.2%" style="-fx-font-size: 32px; -fx-font-weight: bold; -fx-text-fill: #172A3A;" />
+                        <Label text="estimated likelihood of missed visit" styleClass="card-subtitle" />
+                    </HBox>
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <VBox alignment="CENTER_RIGHT" spacing="2">
+                    <Label text="Inference Algorithm" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" />
+                    <Label fx:id="algorithmLabel" text="Logistic Regression (L2)" style="-fx-font-weight: bold; -fx-text-fill: #168C83;" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- HISTORICAL ATTENDANCE BEHAVIOUR SUMMARY -->
+        <VBox spacing="8">
+            <Label text="Historical Attendance Profile" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
+            <VBox style="-fx-background-color: #FFFFFF; -fx-padding: 12px; -fx-background-radius: 6px; -fx-border-color: #E4E9E8; -fx-border-radius: 6px;" spacing="4">
+                <Label fx:id="historySummaryLabel" text="Loading historical attendance record..." style="-fx-font-size: 13px; -fx-text-fill: #202B35;" wrapText="true" />
+            </VBox>
+        </VBox>
+
+        <!-- EXPLAINABLE CONTRIBUTING FACTORS (XAI) -->
+        <VBox spacing="10">
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2">
+                    <Label text="Ranked Contributing Factors (Explainable AI)" style="-fx-font-weight: bold; -fx-font-size: 14px; -fx-text-fill: #172A3A;" />
+                    <Label text="Mathematical feature weight decomposition based on strictly pre-appointment records" styleClass="card-subtitle" />
+                </VBox>
+            </HBox>
+
+            <VBox fx:id="factorsContainer" spacing="8">
+                <!-- Dynamically populated factor cards -->
+            </VBox>
+        </VBox>
+
+        <!-- SUGGESTED ADMINISTRATIVE ACTION -->
+        <VBox spacing="8">
+            <Label text="Recommended Operational Action" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
+            <VBox style="-fx-background-color: #E8F0F5; -fx-padding: 14px; -fx-background-radius: 8px; -fx-border-color: #168C83; -fx-border-radius: 8px; -fx-border-width: 1px;" spacing="6">
+                <HBox alignment="CENTER_LEFT" spacing="8">
+                    <Label text="📋 Action Protocol:" style="-fx-font-weight: bold; -fx-text-fill: #172A3A; -fx-font-size: 13px;" />
+                    <Label text="Administrative Guidance (No Auto-Cancellation)" style="-fx-font-size: 11px; -fx-text-fill: #168C83;" />
+                </HBox>
+                <Label fx:id="suggestedActionLabel" text="Send appointment reminder and request attendance confirmation."
+                       style="-fx-font-size: 13px; -fx-text-fill: #202B35;" wrapText="true" />
+            </VBox>
+        </VBox>
+
+        <!-- AUDIT & GOVERNANCE METADATA -->
+        <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 12px; -fx-background-radius: 6px;">
+            <Label text="Model Governance &amp; Audit Trail" style="-fx-font-weight: bold; -fx-font-size: 11px; -fx-text-fill: #77838D;" />
+            <GridPane hgap="12" vgap="4">
+                <Label text="Prediction ID:" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" GridPane.columnIndex="0" GridPane.rowIndex="0" />
+                <Label fx:id="metaPredictionId" text="PRD-XXXX" style="-fx-font-size: 11px; -fx-font-weight: 600;" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+
+                <Label text="Model Version:" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" GridPane.columnIndex="0" GridPane.rowIndex="1" />
+                <Label fx:id="metaModelVersion" text="LOGISTIC_REGRESSION_V1.2" style="-fx-font-size: 11px; -fx-font-weight: 600;" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Predicted Timestamp:" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                <Label fx:id="metaTimestamp" text="Nov 17, 2026 16:30" style="-fx-font-size: 11px; -fx-font-weight: 600;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            </GridPane>
+        </VBox>
+
+        <!-- Footer Actions -->
+        <HBox alignment="CENTER_RIGHT" spacing="12">
+            <Button fx:id="btnDispatchReminder" onAction="#handleDispatchReminder" styleClass="btn-primary" text="Dispatch Attendance Check-in Prompt" />
+            <Button onAction="#handleClose" styleClass="btn-secondary" text="Close" />
+        </HBox>
+    </VBox>
+</ScrollPane>
