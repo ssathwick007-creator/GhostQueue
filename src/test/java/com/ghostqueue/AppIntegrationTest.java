@@ -1,7 +1,9 @@
 package com.ghostqueue;
 
 import com.ghostqueue.model.*;
+import com.ghostqueue.repository.AppointmentRepository;
 import com.ghostqueue.service.*;
+import com.ghostqueue.supabase.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ public class AppIntegrationTest {
 
         @BeforeEach
         void setUp() {
+                // Authenticate as Admin so all repository/service calls pass Supabase RLS policies
+                SupabaseAuthService.getInstance().signIn("admin@ghostqueue.com", "Admin@123", false);
+
                 registry = ServiceRegistry.getInstance();
                 appointmentService = registry.getAppointmentService();
                 patientService = registry.getPatientService();
@@ -68,6 +73,25 @@ public class AppIntegrationTest {
                                 "/fxml/reminders.fxml",
                                 "/fxml/analytics.fxml",
                                 "/fxml/settings.fxml",
+                                "/fxml/login.fxml",
+                                "/fxml/register.fxml",
+                                "/fxml/account_management.fxml",
+                                "/fxml/patient_layout.fxml",
+                                "/fxml/patient/patient_overview.fxml",
+                                "/fxml/patient/patient_book_appointment.fxml",
+                                "/fxml/patient/patient_my_appointments.fxml",
+                                "/fxml/patient/patient_history.fxml",
+                                "/fxml/patient/patient_doctors.fxml",
+                                "/fxml/patient/patient_notifications.fxml",
+                                "/fxml/patient/patient_profile.fxml",
+                                "/fxml/doctor_layout.fxml",
+                                "/fxml/doctor/doctor_overview.fxml",
+                                "/fxml/doctor/doctor_schedule.fxml",
+                                "/fxml/doctor/doctor_appointments.fxml",
+                                "/fxml/doctor/doctor_patient_info.fxml",
+                                "/fxml/doctor/doctor_availability.fxml",
+                                "/fxml/doctor/doctor_notifications.fxml",
+                                "/fxml/doctor/doctor_profile.fxml",
                                 "/fxml/dialogs/add_appointment_dialog.fxml",
                                 "/fxml/dialogs/add_queue_dialog.fxml",
                                 "/fxml/dialogs/patient_form_dialog.fxml",
@@ -484,5 +508,119 @@ public class AppIntegrationTest {
                 predictionService.updateRiskThresholds(medThreshold, highThreshold);
                 assertEquals(highThreshold, predictionService.getRiskClassifier().getHighThreshold(), 0.001);
                 assertEquals(medThreshold, predictionService.getRiskClassifier().getLowThreshold(), 0.001);
+        }
+
+        @Test
+        @DisplayName("PHASE 9: Verify Supabase 3-Role Authentication (Admin, Doctor, Patient)")
+        void testSupabaseThreeRoleAuthentication() {
+                SupabaseAuthService authService = SupabaseAuthService.getInstance();
+
+                // 1. Admin Authentication
+                SupabaseSession adminSession = authService.signIn("admin@ghostqueue.com", "Admin@123", false);
+                assertNotNull(adminSession);
+                assertTrue(adminSession.isAdmin(), "Admin session must have isAdmin = true");
+                assertEquals("ADMIN", adminSession.getRole());
+                assertEquals("admin@ghostqueue.com", adminSession.getEmail());
+                assertNotNull(adminSession.getAccessToken());
+
+                // 2. Doctor Authentication
+                SupabaseSession doctorSession = authService.signIn("doctor.vance@ghostqueue.com", "Doctor@123", false);
+                assertNotNull(doctorSession);
+                assertTrue(doctorSession.isDoctor(), "Doctor session must have isDoctor = true");
+                assertEquals("DOCTOR", doctorSession.getRole());
+                assertEquals("DOC-101", doctorSession.getDoctorId());
+                assertNotNull(doctorSession.getAccessToken());
+
+                // 3. Patient Authentication
+                SupabaseSession patientSession = authService.signIn("patient.eleanor@ghostqueue.com", "Patient@123", false);
+                assertNotNull(patientSession);
+                assertTrue(patientSession.isPatient(), "Patient session must have isPatient = true");
+                assertEquals("PATIENT", patientSession.getRole());
+                assertEquals("PT-1001", patientSession.getPatientId());
+                assertNotNull(patientSession.getAccessToken());
+        }
+
+        @Test
+        @DisplayName("PHASE 10: Verify Supabase Row Level Security (RLS) Isolation Across Roles")
+        void testRowLevelSecurityDataIsolation() {
+                SupabaseAuthService authService = SupabaseAuthService.getInstance();
+                AppointmentRepository apptRepo = registry.getAppointmentRepository();
+
+                // 1. As Patient: Eleanor Vance (PT-1001)
+                authService.signIn("patient.eleanor@ghostqueue.com", "Patient@123", false);
+                List<Appointment> patientAppts = apptRepo.findAll();
+                assertFalse(patientAppts.isEmpty(), "Patient should see their own appointments");
+                assertTrue(patientAppts.stream().allMatch(a -> "PT-1001".equals(a.getPatientId())),
+                                "RLS MUST restrict patient queries exclusively to their own patient_id (PT-1001)");
+
+                // 2. As Doctor: Dr. Vance (DOC-101)
+                authService.signIn("doctor.vance@ghostqueue.com", "Doctor@123", false);
+                List<Appointment> doctorAppts = apptRepo.findAll();
+                assertFalse(doctorAppts.isEmpty(), "Doctor should see their assigned consultations");
+                assertTrue(doctorAppts.stream().allMatch(a -> "DOC-101".equals(a.getDoctorId())),
+                                "RLS MUST restrict doctor queries exclusively to their attending doctor_id (DOC-101)");
+
+                // 3. As Admin: Hospital Administrator
+                authService.signIn("admin@ghostqueue.com", "Admin@123", false);
+                List<Appointment> adminAppts = apptRepo.findAll();
+                assertTrue(adminAppts.size() > patientAppts.size(), "Admin must have full visibility over all appointments");
+                assertTrue(adminAppts.size() >= 20, "Admin must see complete hospital roster (20+ appointments)");
+
+                // Restore Admin authentication for subsequent tests
+                authService.signIn("admin@ghostqueue.com", "Admin@123", false);
+        }
+
+        @Test
+        @DisplayName("PHASE 11: Verify Patient Slot Booking Conflict Prevention")
+        void testPatientSlotBookingConflictPrevention() {
+                AppointmentRepository apptRepo = registry.getAppointmentRepository();
+
+                LocalDate testDate = LocalDate.now().plusDays(3);
+                LocalTime testTime = LocalTime.of(10, 0);
+
+                // Check conflict detection
+                boolean initialConflict = apptRepo.hasConflictForDoctor("DOC-101", testDate, testTime, null);
+
+                // Book a test slot
+                String testApptId = "APT-TEST-" + System.currentTimeMillis();
+                Appointment testAppt = new Appointment(
+                                testApptId, "PT-1001", "DOC-101", testDate, testTime,
+                                AppointmentStatus.BOOKED, LocalDate.now(), null
+                );
+                testAppt.setReasonForVisit("Test conflict validation consultation");
+                apptRepo.save(testAppt);
+
+                // Now conflict must be detected for that exact slot!
+                boolean hasConflict = apptRepo.hasConflictForDoctor("DOC-101", testDate, testTime, null);
+                assertTrue(hasConflict, "Slot must be flagged as conflicting after booking");
+
+                // Clean up test appointment
+                apptRepo.delete(testApptId);
+        }
+
+        @Test
+        @DisplayName("PHASE 12: Verify Doctor Clinical Encounter Workflow & Notifications")
+        void testDoctorClinicalWorkflow() {
+                SupabaseAuthService authService = SupabaseAuthService.getInstance();
+                authService.signIn("doctor.vance@ghostqueue.com", "Doctor@123", false);
+
+                AppointmentRepository apptRepo = registry.getAppointmentRepository();
+                List<Appointment> docAppts = apptRepo.findByDoctor("DOC-101");
+                assertFalse(docAppts.isEmpty(), "Doctor should have consultations");
+
+                Appointment target = docAppts.get(0);
+                AppointmentStatus originalStatus = target.getStatus();
+
+                // Test status update to CONFIRMED (patient arrived)
+                apptRepo.updateStatus(target.getId(), AppointmentStatus.CONFIRMED);
+                var updated = apptRepo.findById(target.getId());
+                assertTrue(updated.isPresent());
+                assertEquals(AppointmentStatus.CONFIRMED, updated.get().getStatus());
+
+                // Restore original status
+                apptRepo.updateStatus(target.getId(), originalStatus);
+
+                // Restore Admin authentication for subsequent tests
+                authService.signIn("admin@ghostqueue.com", "Admin@123", false);
         }
 }

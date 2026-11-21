@@ -31,7 +31,13 @@ public class MainLayoutController {
     @FXML private Button navReminders;
     @FXML private Button navPatients;
     @FXML private Button navAnalytics;
+    @FXML private Button navAccounts;
     @FXML private Button navSettings;
+
+    @FXML private Label adminAvatarLabel;
+    @FXML private Label adminNameLabel;
+    @FXML private Label adminRoleLabel;
+    @FXML private Button logoutButton;
 
     @FXML private Label breadcrumbLabel;
     @FXML private Label pageTitleLabel;
@@ -61,7 +67,20 @@ public class MainLayoutController {
         setupNavIcon(navReminders, "reminders");
         setupNavIcon(navPatients, "patients");
         setupNavIcon(navAnalytics, "analytics");
+        setupNavIcon(navAccounts, "accounts");
         setupNavIcon(navSettings, "settings");
+
+        // Setup User Info
+        com.ghostqueue.supabase.SupabaseSession session = com.ghostqueue.supabase.SessionManager.getInstance().getCurrentSession();
+        if (session != null) {
+            if (adminNameLabel != null) adminNameLabel.setText(session.getFullName());
+            if (adminRoleLabel != null) adminRoleLabel.setText("System Administrator (" + session.getEmail() + ")");
+            if (adminAvatarLabel != null) {
+                String initial = session.getFullName() != null && !session.getFullName().isBlank()
+                        ? session.getFullName().substring(0, 1).toUpperCase() : "A";
+                adminAvatarLabel.setText(initial);
+            }
+        }
 
         // Setup Top Nav Date
         currentDateLabel.setText(DateTimeUtils.formatHeaderDate(LocalDate.now()));
@@ -86,6 +105,7 @@ public class MainLayoutController {
             case "reminders" -> handleNavReminders();
             case "patients" -> handleNavPatients();
             case "analytics" -> handleNavAnalytics();
+            case "accounts" -> handleNavAccounts();
             case "settings" -> handleNavSettings();
         }
     }
@@ -139,9 +159,20 @@ public class MainLayoutController {
     }
 
     @FXML
+    private void handleNavAccounts() {
+        setActiveButton(navAccounts);
+        loadView("accounts", "/fxml/account_management.fxml", "System Administration / Account Governance", "User Account Governance & Doctor Approvals");
+    }
+
+    @FXML
     private void handleNavSettings() {
         setActiveButton(navSettings);
         loadView("settings", "/fxml/settings.fxml", "System Preferences / Configuration", "System Configuration");
+    }
+
+    @FXML
+    private void handleLogout() {
+        com.ghostqueue.util.NavigationManager.logout();
     }
 
     private void setActiveButton(Button button) {
@@ -170,6 +201,7 @@ public class MainLayoutController {
         if (button == navReminders) return "reminders";
         if (button == navPatients) return "patients";
         if (button == navAnalytics) return "analytics";
+        if (button == navAccounts) return "accounts";
         if (button == navSettings) return "settings";
         return "overview";
     }

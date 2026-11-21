@@ -98,14 +98,22 @@ public class ReallocationService {
                     });
                 }
 
-                // Record in MySQL reallocation_history audit log
+                // Resolve real doctor ID
+                String realDoctorId = appointmentService.getAppointmentById(s.getSlotAppointmentId())
+                        .map(Appointment::getDoctorId)
+                        .orElseGet(() -> {
+                            String dId = s.getCandidatePatient().getDoctorId();
+                            return (dId != null && !dId.isBlank() && dId.startsWith("DOC-")) ? dId : "DOC-101";
+                        });
+
+                // Record in reallocation_history audit log
                 ReallocationHistory historyRecord = new ReallocationHistory(
                         "RH-" + System.currentTimeMillis() % 1000000,
                         s.getSlotAppointmentId(),
                         s.getCandidatePatient().getQueueId(),
                         s.getCandidatePatient().getPatientId(),
                         s.getCandidatePatient().getPatientName(),
-                        s.getSlotAppointmentId(),
+                        realDoctorId,
                         s.getDoctorName(),
                         s.getDepartment(),
                         s.getSlotDate(),
@@ -136,13 +144,21 @@ public class ReallocationService {
             if (s.getSuggestionId().equals(suggestionId)) {
                 s.setStatus("DECLINED");
 
+                // Resolve real doctor ID
+                String realDoctorId = appointmentService.getAppointmentById(s.getSlotAppointmentId())
+                        .map(Appointment::getDoctorId)
+                        .orElseGet(() -> {
+                            String dId = s.getCandidatePatient().getDoctorId();
+                            return (dId != null && !dId.isBlank() && dId.startsWith("DOC-")) ? dId : "DOC-101";
+                        });
+
                 ReallocationHistory historyRecord = new ReallocationHistory(
                         "RH-" + System.currentTimeMillis() % 1000000,
                         s.getSlotAppointmentId(),
                         s.getCandidatePatient().getQueueId(),
                         s.getCandidatePatient().getPatientId(),
                         s.getCandidatePatient().getPatientName(),
-                        s.getSlotAppointmentId(),
+                        realDoctorId,
                         s.getDoctorName(),
                         s.getDepartment(),
                         s.getSlotDate(),

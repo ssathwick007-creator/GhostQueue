@@ -12,6 +12,7 @@ public class Patient {
     private String email;
     private String address;
     private LocalDateTime createdAt;
+    private LocalDate dateOfBirth;
 
     // Derived / historical metrics
     private String primaryPhysician;
@@ -96,6 +97,19 @@ public class Patient {
 
     public void setAge(int age) {
         this.age = age;
+    }
+
+    public LocalDate getDateOfBirth() {
+        if (dateOfBirth != null) return dateOfBirth;
+        if (age > 0) return LocalDate.now().minusYears(age);
+        return null;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+        if (dateOfBirth != null) {
+            this.age = (int) java.time.temporal.ChronoUnit.YEARS.between(dateOfBirth, LocalDate.now());
+        }
     }
 
     public String getGender() {

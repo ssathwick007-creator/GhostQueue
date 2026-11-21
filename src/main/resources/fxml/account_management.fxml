@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ghostqueue.controller.AccountManagementController"
+      spacing="20" style="-fx-padding: 4px;">
+
+    <!-- KPI Summary Cards -->
+    <HBox spacing="18">
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="6" style="-fx-padding: 18px 20px;">
+            <Label text="TOTAL USER PROFILES" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+            <Label fx:id="totalProfilesLabel" text="6" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Accounts in Supabase" style="-fx-font-size: 11px; -fx-text-fill: #168C83; -fx-font-weight: 500;" />
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="6" style="-fx-padding: 18px 20px;">
+            <Label text="APPROVED PHYSICIANS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+            <Label fx:id="approvedDocsLabel" text="2" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Active clinical rosters" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" />
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="6" style="-fx-padding: 18px 20px;">
+            <Label text="PENDING APPROVALS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+            <Label fx:id="pendingDocsLabel" text="1" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #D99A42;" />
+            <Label text="Requires administrator sign-off" style="-fx-font-size: 11px; -fx-text-fill: #D99A42; -fx-font-weight: 500;" />
+        </VBox>
+
+        <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="6" style="-fx-padding: 18px 20px;">
+            <Label text="ACTIVE PATIENTS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+            <Label fx:id="patientsCountLabel" text="2" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Registered health portals" style="-fx-font-size: 11px; -fx-text-fill: #77838D;" />
+        </VBox>
+    </HBox>
+
+    <!-- Control Header -->
+    <HBox alignment="CENTER_LEFT" spacing="14" styleClass="card" style="-fx-padding: 16px 20px;">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="User Accounts &amp; Access Governance" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Review registered users, approve new physician accounts, or suspend platform credentials." style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+        </VBox>
+
+        <ComboBox fx:id="roleFilterCombo" promptText="Filter by role" prefWidth="160"
+                  style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px;" />
+
+        <TextField fx:id="searchField" promptText="Search name or email..." prefWidth="220"
+                   style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 7px 12px; -fx-font-size: 12.5px;" />
+
+        <Button text="Refresh" onAction="#handleRefresh"
+                style="-fx-background-color: #F0F4F8; -fx-text-fill: #142A3A; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8px 16px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- Profiles Table -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="12">
+        <TableView fx:id="profilesTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+            <columns>
+                <TableColumn fx:id="colId" prefWidth="140.0" text="PROFILE ID" />
+                <TableColumn fx:id="colName" prefWidth="220.0" text="USER FULL NAME" />
+                <TableColumn fx:id="colEmail" prefWidth="240.0" text="EMAIL ADDRESS" />
+                <TableColumn fx:id="colRole" prefWidth="120.0" text="ROLE" />
+                <TableColumn fx:id="colApproval" prefWidth="140.0" text="APPROVAL STATE" />
+                <TableColumn fx:id="colStatus" prefWidth="120.0" text="ACCOUNT STATUS" />
+                <TableColumn fx:id="colActions" prefWidth="220.0" text="GOVERNANCE ACTION" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+
+</VBox>

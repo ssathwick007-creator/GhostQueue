@@ -81,6 +81,10 @@ public class Doctor {
         return "AVAILABLE".equalsIgnoreCase(availabilityStatus);
     }
 
+    public void setAvailable(boolean available) {
+        this.availabilityStatus = available ? "AVAILABLE" : "BUSY";
+    }
+
     @Override
     public String toString() {
         return fullName + " (" + department + ")";

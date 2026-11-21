@@ -28,4 +28,16 @@ public interface AppointmentRepository {
     int countTotal();
     int countToday();
     int countByStatus(AppointmentStatus status);
+
+    default List<Appointment> findByDoctor(String doctorId) {
+        return findByDoctorId(doctorId);
+    }
+
+    default void updateStatus(String appointmentId, AppointmentStatus newStatus) {
+        updateStatus(appointmentId, newStatus, null, "Status updated by clinical staff");
+    }
+
+    default void cancelAppointment(String appointmentId, String cancellationReason) {
+        updateStatus(appointmentId, AppointmentStatus.CANCELLED, cancellationReason, "Patient / Clinical cancellation");
+    }
 }

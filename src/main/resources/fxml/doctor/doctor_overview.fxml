@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ghostqueue.controller.doctor.DoctorOverviewController"
+            fitToWidth="true"
+            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+
+    <VBox spacing="24" style="-fx-padding: 4px;">
+
+        <!-- Next Patient Hero Card -->
+        <VBox fx:id="nextPatientHero"
+              style="-fx-background-color: linear-gradient(to right, #102636, #142A3A); -fx-background-radius: 12px; -fx-padding: 26px 30px; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 12, 0, 0, 3);">
+            <HBox alignment="CENTER_LEFT" spacing="20">
+                <VBox spacing="6" HBox.hgrow="ALWAYS">
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Label text="NEXT PATIENT IN CLINIC"
+                               style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #168C83; -fx-letter-spacing: 1px;" />
+                        <Label fx:id="heroRiskBadge" text="LOW RISK"
+                               style="-fx-background-color: rgba(67, 139, 112, 0.25); -fx-text-fill: #438B70; -fx-font-size: 10.5px; -fx-font-weight: bold; -fx-padding: 3px 8px; -fx-background-radius: 4px;" />
+                    </HBox>
+                    <Label fx:id="heroPatientName" text="Eleanor Vance"
+                           style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF;" />
+                    <Label fx:id="heroComplaint" text="Chief Complaint: Routine cardiovascular evaluation &amp; ECG review"
+                           style="-fx-font-size: 13px; -fx-text-fill: #A0B2C6;" />
+
+                    <Region prefHeight="8" />
+
+                    <HBox spacing="24" alignment="CENTER_LEFT">
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="⏰" style="-fx-font-size: 14px;" />
+                            <Label fx:id="heroTimeLabel" text="09:30 AM (Scheduled Today)"
+                                   style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #FFFFFF;" />
+                        </HBox>
+                        <HBox spacing="8" alignment="CENTER_LEFT">
+                            <Label text="📋" style="-fx-font-size: 14px;" />
+                            <Label fx:id="heroStatusLabel" text="Status: BOOKED"
+                                   style="-fx-font-size: 13px; -fx-font-weight: 600; -fx-text-fill: #FFFFFF;" />
+                        </HBox>
+                    </HBox>
+                </VBox>
+
+                <VBox spacing="10" alignment="CENTER_RIGHT">
+                    <Button text="Mark as Arrived" onAction="#handleHeroMarkArrived"
+                            style="-fx-background-color: #168C83; -fx-text-fill: #FFFFFF; -fx-font-size: 12.5px; -fx-font-weight: 600; -fx-padding: 8px 18px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+                    <Button text="Complete Consultation" onAction="#handleHeroComplete"
+                            style="-fx-background-color: rgba(255, 255, 255, 0.1); -fx-text-fill: #FFFFFF; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8px 18px; -fx-background-radius: 6px; -fx-cursor: hand; -fx-border-color: rgba(255, 255, 255, 0.2); -fx-border-radius: 6px;" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- No Patient State Card -->
+        <VBox fx:id="noPatientCard" managed="false" visible="false"
+              style="-fx-background-color: #FFFFFF; -fx-background-radius: 12px; -fx-padding: 32px; -fx-border-color: #E5E9ED; -fx-border-radius: 12px; -fx-border-width: 1px;" alignment="CENTER" spacing="12">
+            <Label text="Clinic Roster Clear" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="No upcoming consultations scheduled for the current session." style="-fx-font-size: 12.5px; -fx-text-fill: #77838D;" />
+        </VBox>
+
+        <!-- Operational Metrics Cards -->
+        <HBox spacing="18">
+            <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="8" style="-fx-padding: 20px;">
+                <Label text="TODAY'S VISITS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+                <Label fx:id="todayCountLabel" text="3" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+                <Label text="Scheduled for today" style="-fx-font-size: 11.5px; -fx-text-fill: #168C83; -fx-font-weight: 500;" />
+            </VBox>
+
+            <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="8" style="-fx-padding: 20px;">
+                <Label text="COMPLETED" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+                <Label fx:id="completedCountLabel" text="1" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+                <Label text="Consultations finished" style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+            </VBox>
+
+            <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="8" style="-fx-padding: 20px;">
+                <Label text="HIGH-RISK NO-SHOWS" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+                <Label fx:id="highRiskCountLabel" text="1" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #C95F5F;" />
+                <Label text="Pre-screened by ML engine" style="-fx-font-size: 11.5px; -fx-text-fill: #C95F5F; -fx-font-weight: 500;" />
+            </VBox>
+
+            <VBox HBox.hgrow="ALWAYS" styleClass="card" spacing="8" style="-fx-padding: 20px;">
+                <Label text="STANDBY CANDIDATES" style="-fx-font-size: 11px; -fx-font-weight: bold; -fx-text-fill: #77838D; -fx-letter-spacing: 0.6px;" />
+                <Label fx:id="standbyCountLabel" text="2" style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+                <Label text="Waiting queue triage pool" style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+            </VBox>
+        </HBox>
+
+        <!-- Today's Schedule Table -->
+        <VBox styleClass="card" spacing="16">
+            <HBox alignment="CENTER_LEFT">
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label text="Today's Consultation Schedule" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+                    <Label text="Real-time patient roster for attending physician clinic" style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+                </VBox>
+                <Button text="View Full Schedule" onAction="#handleViewFullSchedule"
+                        style="-fx-background-color: #F0F4F8; -fx-text-fill: #142A3A; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 6px 14px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+            </HBox>
+
+            <TableView fx:id="scheduleTable" prefHeight="240.0" styleClass="modern-table">
+                <columns>
+                    <TableColumn fx:id="colId" prefWidth="110.0" text="APPOINTMENT ID" />
+                    <TableColumn fx:id="colPatient" prefWidth="220.0" text="PATIENT NAME" />
+                    <TableColumn fx:id="colTime" prefWidth="100.0" text="TIME" />
+                    <TableColumn fx:id="colRisk" prefWidth="130.0" text="NO-SHOW RISK" />
+                    <TableColumn fx:id="colStatus" prefWidth="140.0" text="STATUS" />
+                    <TableColumn fx:id="colReason" prefWidth="280.0" text="CHIEF COMPLAINT" />
+                </columns>
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

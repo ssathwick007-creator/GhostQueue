@@ -49,22 +49,26 @@
                             styleClass="nav-button" text="Patient Records" />
                     <Button fx:id="navAnalytics" maxWidth="Infinity" onAction="#handleNavAnalytics"
                             styleClass="nav-button" text="Analytics" />
+                    <Button fx:id="navAccounts" maxWidth="Infinity" onAction="#handleNavAccounts"
+                            styleClass="nav-button" text="Account Management" />
                     <Button fx:id="navSettings" maxWidth="Infinity" onAction="#handleNavSettings"
                             styleClass="nav-button" text="Settings" />
                 </VBox>
             </ScrollPane>
 
-            <!-- Admin Profile Footer -->
-            <VBox styleClass="sidebar-footer">
+            <!-- Admin Profile Footer & Sign Out -->
+            <VBox styleClass="sidebar-footer" spacing="10">
                 <HBox alignment="CENTER_LEFT" spacing="12">
                     <StackPane styleClass="user-avatar-circle">
-                        <Label text="SC" styleClass="user-avatar-text" />
+                        <Label fx:id="adminAvatarLabel" text="AD" styleClass="user-avatar-text" />
                     </StackPane>
-                    <VBox spacing="2">
-                        <Label text="Dr. Sarah Chen" styleClass="user-name" />
-                        <Label text="Chief Medical Operations" styleClass="user-role" />
+                    <VBox spacing="2" HBox.hgrow="ALWAYS">
+                        <Label fx:id="adminNameLabel" text="Hospital Administrator" styleClass="user-name" />
+                        <Label fx:id="adminRoleLabel" text="Chief Medical Operations" styleClass="user-role" />
                     </VBox>
                 </HBox>
+                <Button fx:id="logoutButton" text="Sign Out" onAction="#handleLogout" maxWidth="Infinity"
+                        style="-fx-background-color: rgba(201, 95, 95, 0.15); -fx-text-fill: #F8B4B4; -fx-font-size: 11.5px; -fx-font-weight: 600; -fx-padding: 7px 12px; -fx-background-radius: 6px; -fx-cursor: hand;" />
             </VBox>
         </VBox>
     </left>

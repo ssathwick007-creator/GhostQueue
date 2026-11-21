@@ -20,6 +20,17 @@ public class AppointmentHistory {
         this.remarks = remarks != null ? remarks : "";
     }
 
+    public AppointmentHistory(String id, String appointmentId, Object previousStatus, Object newStatus, String remarks) {
+        this(
+            id != null ? Math.abs(id.hashCode()) : 0,
+            appointmentId,
+            previousStatus != null ? previousStatus.toString() : "—",
+            newStatus != null ? newStatus.toString() : "BOOKED",
+            LocalDateTime.now(),
+            remarks
+        );
+    }
+
     public int getHistoryId() {
         return historyId;
     }

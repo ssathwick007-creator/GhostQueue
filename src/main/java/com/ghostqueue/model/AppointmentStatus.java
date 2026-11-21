@@ -4,6 +4,8 @@ public enum AppointmentStatus {
     ALL("All Statuses", "badge-neutral"),
     BOOKED("Booked", "badge-pending"),
     CONFIRMED("Confirmed", "badge-confirmed"),
+    PENDING_REALLOCATION("Pending Reallocation", "badge-pending"),
+    REALLOCATED("Reallocated", "badge-confirmed"),
     COMPLETED("Completed", "badge-completed"),
     CANCELLED("Cancelled", "badge-danger"),
     NO_SHOW("No-Show", "badge-danger");

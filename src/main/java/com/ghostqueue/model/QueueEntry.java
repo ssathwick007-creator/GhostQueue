@@ -68,6 +68,38 @@ public class QueueEntry implements Comparable<QueueEntry> {
         this.queueId = queueId;
     }
 
+    public String getId() {
+        return queueId;
+    }
+
+    public void setId(String id) {
+        this.queueId = id;
+    }
+
+    public Department getDepartment() {
+        return requestedDepartment;
+    }
+
+    public void setDepartment(Department department) {
+        this.requestedDepartment = department;
+    }
+
+    public String getDoctorName() {
+        return preferredDoctor;
+    }
+
+    public void setDoctorName(String doctorName) {
+        this.preferredDoctor = doctorName;
+    }
+
+    public String getPreferredTime() {
+        return preferredTimeSlot;
+    }
+
+    public void setPreferredTime(String preferredTime) {
+        this.preferredTimeSlot = preferredTime;
+    }
+
     public String getPatientId() {
         return patientId;
     }
@@ -117,6 +149,14 @@ public class QueueEntry implements Comparable<QueueEntry> {
     }
 
     public void setStatus(QueueStatus status) {
+        this.status = status;
+    }
+
+    public QueueStatus getQueueStatus() {
+        return status;
+    }
+
+    public void setQueueStatus(QueueStatus status) {
         this.status = status;
     }
 

@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<HBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ghostqueue.controller.doctor.DoctorLayoutController"
+      prefHeight="840.0" prefWidth="1300.0"
+      style="-fx-background-color: #F5F7F8;">
+
+    <!-- Left Sidebar -->
+    <VBox prefWidth="255.0" minWidth="255.0" maxWidth="255.0"
+          style="-fx-background-color: #102636;" HBox.hgrow="NEVER">
+
+        <!-- Sidebar Header Brand -->
+        <VBox style="-fx-padding: 24px 20px 20px 20px; -fx-border-color: rgba(255,255,255,0.08); -fx-border-width: 0 0 1px 0;">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <StackPane fx:id="brandIconContainer" prefWidth="36" prefHeight="36"
+                           style="-fx-background-color: rgba(22, 140, 131, 0.25); -fx-background-radius: 8px; -fx-border-color: #168C83; -fx-border-radius: 8px; -fx-border-width: 1px;" />
+                <VBox spacing="2">
+                    <Label text="GHOSTQUEUE" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #FFFFFF; -fx-letter-spacing: 1.2px;" />
+                    <Label text="PHYSICIAN CLINICAL PORTAL" style="-fx-font-size: 10px; -fx-font-weight: 600; -fx-text-fill: #168C83; -fx-letter-spacing: 0.8px;" />
+                </VBox>
+            </HBox>
+        </VBox>
+
+        <!-- Navigation Buttons -->
+        <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+            <VBox spacing="4" style="-fx-padding: 16px 12px;">
+                <Button fx:id="navOverview" text="Clinical Overview" onAction="#handleNavOverview" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navSchedule" text="My Schedule" onAction="#handleNavSchedule" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navAppointments" text="Today's Consultations" onAction="#handleNavAppointments" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navPatients" text="Patient Records" onAction="#handleNavPatients" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navAvailability" text="Availability &amp; Hours" onAction="#handleNavAvailability" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navNotifications" text="Notifications" onAction="#handleNavNotifications" maxWidth="Infinity" styleClass="nav-button" />
+                <Button fx:id="navProfile" text="Physician Profile" onAction="#handleNavProfile" maxWidth="Infinity" styleClass="nav-button" />
+            </VBox>
+        </ScrollPane>
+
+        <!-- Sidebar Footer / Doctor Info & Logout -->
+        <VBox style="-fx-padding: 16px; -fx-background-color: #0D1F2D; -fx-border-color: rgba(255,255,255,0.08); -fx-border-width: 1px 0 0 0;" spacing="12">
+            <HBox spacing="10" alignment="CENTER_LEFT">
+                <StackPane prefWidth="38" prefHeight="38" style="-fx-background-color: #168C83; -fx-background-radius: 19px;">
+                    <Label fx:id="userAvatarLabel" text="D" style="-fx-text-fill: #FFFFFF; -fx-font-size: 14px; -fx-font-weight: bold;" />
+                </StackPane>
+                <VBox spacing="2" HBox.hgrow="ALWAYS">
+                    <Label fx:id="userNameLabel" text="Dr. Alexander Vance" style="-fx-text-fill: #FFFFFF; -fx-font-size: 13px; -fx-font-weight: 600;" />
+                    <Label fx:id="userDeptLabel" text="Cardiology Specialist" style="-fx-text-fill: #77838D; -fx-font-size: 11px;" />
+                </VBox>
+            </HBox>
+            <Button fx:id="logoutButton" text="Sign Out" onAction="#handleLogout" maxWidth="Infinity"
+                    style="-fx-background-color: rgba(201, 95, 95, 0.15); -fx-text-fill: #F8B4B4; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8px 12px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+        </VBox>
+    </VBox>
+
+    <!-- Main Content Area -->
+    <VBox HBox.hgrow="ALWAYS" style="-fx-background-color: #F5F7F8;">
+
+        <!-- Top Navigation Bar -->
+        <HBox alignment="CENTER_LEFT" spacing="16" style="-fx-background-color: #FFFFFF; -fx-border-color: #E5E9ED; -fx-border-width: 0 0 1px 0; -fx-padding: 14px 28px;">
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label fx:id="breadcrumbLabel" text="Physician Portal / Overview" style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+                <Label fx:id="pageTitleLabel" text="Physician Operations Overview" style="-fx-font-size: 19px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            </VBox>
+
+            <Label fx:id="currentDateLabel" text="Date Today" style="-fx-font-size: 12.5px; -fx-text-fill: #77838D; -fx-font-weight: 500;" />
+
+            <!-- Live Status Indicator Pill -->
+            <HBox spacing="6" alignment="CENTER"
+                  style="-fx-background-color: #E6F5F3; -fx-border-color: #B8E4DF; -fx-border-radius: 20px; -fx-background-radius: 20px; -fx-padding: 6px 14px;">
+                <StackPane prefWidth="8" prefHeight="8" style="-fx-background-color: #168C83; -fx-background-radius: 4px;" />
+                <Label fx:id="statusPillLabel" text="Available for Consultations" style="-fx-text-fill: #168C83; -fx-font-size: 11.5px; -fx-font-weight: 600;" />
+            </HBox>
+        </HBox>
+
+        <!-- Dynamic Content Container -->
+        <StackPane fx:id="contentContainer" VBox.vgrow="ALWAYS" style="-fx-padding: 24px;" />
+    </VBox>
+</HBox>

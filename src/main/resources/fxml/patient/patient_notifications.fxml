@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.ghostqueue.controller.patient.PatientNotificationsController"
+      spacing="18" style="-fx-padding: 4px;">
+
+    <!-- Control Header -->
+    <HBox alignment="CENTER_LEFT" spacing="14" styleClass="card" style="-fx-padding: 16px 20px;">
+        <VBox spacing="2" HBox.hgrow="ALWAYS">
+            <Label text="In-App Notifications &amp; Clinic Communications" style="-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Real-time appointment confirmations, reminders, and scheduling alerts." style="-fx-font-size: 11.5px; -fx-text-fill: #77838D;" />
+        </VBox>
+
+        <Button text="Mark All as Read" onAction="#handleMarkAllRead"
+                style="-fx-background-color: #F0F4F8; -fx-text-fill: #168C83; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8px 16px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+        <Button text="Refresh" onAction="#handleRefresh"
+                style="-fx-background-color: #F0F4F8; -fx-text-fill: #142A3A; -fx-font-size: 12px; -fx-font-weight: 600; -fx-padding: 8px 16px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+    </HBox>
+
+    <!-- Table -->
+    <VBox styleClass="card" VBox.vgrow="ALWAYS" spacing="12">
+        <TableView fx:id="notificationsTable" VBox.vgrow="ALWAYS" styleClass="modern-table">
+            <columns>
+                <TableColumn fx:id="colType" prefWidth="130.0" text="ALERT TYPE" />
+                <TableColumn fx:id="colTitle" prefWidth="220.0" text="NOTIFICATION TITLE" />
+                <TableColumn fx:id="colMessage" prefWidth="440.0" text="DETAILS" />
+                <TableColumn fx:id="colDate" prefWidth="160.0" text="TIMESTAMP" />
+                <TableColumn fx:id="colStatus" prefWidth="100.0" text="STATE" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </VBox>
+
+</VBox>

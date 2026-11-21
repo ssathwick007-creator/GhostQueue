@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.ghostqueue.controller.patient.PatientBookAppointmentController"
+            fitToWidth="true"
+            style="-fx-background-color: transparent; -fx-background: transparent; -fx-border-color: transparent;">
+
+    <VBox spacing="24" style="-fx-padding: 4px;">
+
+        <!-- Header Banner -->
+        <VBox styleClass="card" spacing="8" style="-fx-padding: 24px;">
+            <Label text="Book a Clinical Consultation" style="-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #142A3A;" />
+            <Label text="Select your clinical department, preferred attending physician, consultation date, and available slot."
+                   style="-fx-font-size: 12.5px; -fx-text-fill: #77838D;" />
+        </VBox>
+
+        <!-- Booking Form Container -->
+        <VBox styleClass="card" spacing="22" style="-fx-padding: 28px;">
+
+            <!-- Step 1: Department & Doctor -->
+            <GridPane hgap="20" vgap="16">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50" />
+                    <ColumnConstraints percentWidth="50" />
+                </columnConstraints>
+
+                <!-- Department -->
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                    <Label text="1. Select Clinical Department *" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                    <ComboBox fx:id="departmentCombo" maxWidth="Infinity" promptText="Select specialty department"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 4px;" />
+                </VBox>
+
+                <!-- Doctor -->
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="0">
+                    <Label text="2. Select Attending Physician *" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                    <ComboBox fx:id="doctorCombo" maxWidth="Infinity" promptText="Choose physician"
+                              style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 4px;" />
+                </VBox>
+
+                <!-- Date -->
+                <VBox spacing="6" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                    <Label text="3. Consultation Date *" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                    <DatePicker fx:id="appointmentDatePicker" maxWidth="Infinity"
+                                style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-padding: 4px;" />
+                </VBox>
+
+                <!-- Physician Information Pill -->
+                <VBox spacing="6" GridPane.columnIndex="1" GridPane.rowIndex="1">
+                    <Label text="Physician Details" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                    <Label fx:id="doctorDetailsLabel" text="Select a doctor to view credentials"
+                           style="-fx-font-size: 12px; -fx-text-fill: #5A7184; -fx-background-color: #F8F9FA; -fx-padding: 10px 14px; -fx-background-radius: 6px; -fx-border-color: #E2E6EA; -fx-border-radius: 6px;" />
+                </VBox>
+            </GridPane>
+
+            <Separator />
+
+            <!-- Step 2: Available Slots -->
+            <VBox spacing="10">
+                <HBox alignment="CENTER_LEFT" spacing="12">
+                    <Label text="4. Available Appointment Slots *" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                    <Label fx:id="selectedSlotLabel" text="No slot selected"
+                           style="-fx-font-size: 11.5px; -fx-font-weight: bold; -fx-text-fill: #168C83;" />
+                </HBox>
+                <FlowPane fx:id="slotsFlowPane" hgap="10" vgap="10"
+                          style="-fx-padding: 10px 0;" />
+            </VBox>
+
+            <Separator />
+
+            <!-- Step 3: Reason / Clinical Notes -->
+            <VBox spacing="6">
+                <Label text="5. Chief Complaint / Reason for Consultation *" style="-fx-font-size: 12.5px; -fx-font-weight: 600; -fx-text-fill: #142A3A;" />
+                <TextArea fx:id="reasonArea" prefRowCount="3" promptText="Describe symptoms, concerns, or consultation purpose..."
+                          style="-fx-background-color: #FFFFFF; -fx-border-color: #D1DDE8; -fx-border-radius: 6px; -fx-background-radius: 6px; -fx-font-size: 13px;" />
+            </VBox>
+
+            <!-- Submit Section -->
+            <HBox spacing="16" alignment="CENTER_RIGHT" style="-fx-padding: 10px 0 0 0;">
+                <Button text="Reset Selection" onAction="#handleReset"
+                        style="-fx-background-color: #F0F4F8; -fx-text-fill: #5A7184; -fx-font-size: 13px; -fx-font-weight: 600; -fx-padding: 10px 20px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+                <Button fx:id="confirmBookingBtn" text="Confirm &amp; Book Appointment" onAction="#handleConfirmBooking"
+                        style="-fx-background-color: #168C83; -fx-text-fill: #FFFFFF; -fx-font-size: 13.5px; -fx-font-weight: bold; -fx-padding: 10px 24px; -fx-background-radius: 6px; -fx-cursor: hand;" />
+            </HBox>
+
+        </VBox>
+
+    </VBox>
+</ScrollPane>

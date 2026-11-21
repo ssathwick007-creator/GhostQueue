@@ -1,9 +1,9 @@
 package com.ghostqueue;
 
+import com.ghostqueue.supabase.SessionManager;
+import com.ghostqueue.supabase.SupabaseSession;
+import com.ghostqueue.util.NavigationManager;
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 public class MainApp extends Application {
@@ -11,16 +11,14 @@ public class MainApp extends Application {
     @Override
     public void start(Stage primaryStage) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main_layout.fxml"));
-            Parent root = loader.load();
+            NavigationManager.setPrimaryStage(primaryStage);
 
-            Scene scene = new Scene(root, 1340, 860);
-            scene.getStylesheets().add(getClass().getResource("/css/theme.css").toExternalForm());
-
-            primaryStage.setTitle("GhostQueue — Intelligent Predictive No-Show Detection & Dynamic Appointment Reallocation");
-            primaryStage.setScene(scene);
-            primaryStage.setMinWidth(1150);
-            primaryStage.setMinHeight(720);
+            if (SessionManager.getInstance().isAuthenticated()) {
+                SupabaseSession.UserRole role = SessionManager.getInstance().getCurrentRole();
+                NavigationManager.navigateToPortal(role);
+            } else {
+                NavigationManager.navigateToLogin();
+            }
 
             primaryStage.show();
         } catch (Exception e) {

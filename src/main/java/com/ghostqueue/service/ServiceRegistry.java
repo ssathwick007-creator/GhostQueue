@@ -1,10 +1,10 @@
 package com.ghostqueue.service;
 
+import com.ghostqueue.prediction.PredictionRepository;
+import com.ghostqueue.prediction.SupabasePredictionRepository;
 import com.ghostqueue.repository.*;
-import com.ghostqueue.util.DatabaseConnection;
-import com.ghostqueue.util.DatabaseInitializer;
+import com.ghostqueue.repository.supabase.*;
 
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ServiceRegistry {
@@ -16,7 +16,7 @@ public class ServiceRegistry {
     private final AppointmentHistoryRepository historyRepository;
     private final AppointmentRepository appointmentRepository;
     private final QueueRepository queueRepository;
-    private final com.ghostqueue.prediction.PredictionRepository predictionRepository;
+    private final PredictionRepository predictionRepository;
     private final ReallocationHistoryRepository reallocationHistoryRepository;
     private final ReminderRepository reminderRepository;
 
@@ -29,24 +29,19 @@ public class ServiceRegistry {
     private final AnalyticsService analyticsService;
     private final ReminderService reminderService;
     private final SettingsService settingsService;
+    private final NotificationService notificationService;
 
     private ServiceRegistry() {
-        LOGGER.info("Initializing GhostQueue ServiceRegistry with JDBC repositories...");
+        LOGGER.info("Initializing GhostQueue ServiceRegistry with Supabase PostgreSQL & Auth...");
 
-        // Ensure database schema and seed data are initialized
-        boolean dbOk = DatabaseInitializer.initializeDatabase();
-        if (!dbOk) {
-            LOGGER.warning("GhostQueue database initialization returned false. Verifying connection...");
-        }
-
-        this.patientRepository = new JdbcPatientRepository();
-        this.doctorRepository = new JdbcDoctorRepository();
-        this.historyRepository = new JdbcAppointmentHistoryRepository();
-        this.appointmentRepository = new JdbcAppointmentRepository();
-        this.queueRepository = new JdbcQueueRepository();
-        this.predictionRepository = new com.ghostqueue.prediction.JdbcPredictionRepository();
-        this.reallocationHistoryRepository = new JdbcReallocationHistoryRepository();
-        this.reminderRepository = new JdbcReminderRepository();
+        this.patientRepository = new SupabasePatientRepository();
+        this.doctorRepository = new SupabaseDoctorRepository();
+        this.historyRepository = new SupabaseAppointmentHistoryRepository();
+        this.appointmentRepository = new SupabaseAppointmentRepository();
+        this.queueRepository = new SupabaseQueueRepository();
+        this.predictionRepository = new SupabasePredictionRepository();
+        this.reallocationHistoryRepository = new SupabaseReallocationHistoryRepository();
+        this.reminderRepository = new SupabaseReminderRepository();
 
         this.patientService = new PatientService(patientRepository);
         this.doctorService = new DoctorService(doctorRepository);
@@ -68,6 +63,7 @@ public class ServiceRegistry {
                 predictionService
         );
         this.settingsService = new SettingsService();
+        this.notificationService = NotificationService.getInstance();
 
         // Sync initial model risk thresholds from persisted settings
         double highRisk = settingsService.getHighRiskThreshold();
@@ -75,7 +71,7 @@ public class ServiceRegistry {
         this.predictionService.getRiskClassifier().setHighThreshold(highRisk);
         this.predictionService.getRiskClassifier().setLowThreshold(medRisk);
 
-        LOGGER.info("GhostQueue ServiceRegistry initialized successfully with active MySQL database integration.");
+        LOGGER.info("GhostQueue ServiceRegistry initialized successfully with primary Supabase backend.");
     }
 
     public static synchronized ServiceRegistry getInstance() {
@@ -85,68 +81,38 @@ public class ServiceRegistry {
         return instance;
     }
 
-    public PatientRepository getPatientRepository() {
-        return patientRepository;
-    }
+    public PatientRepository getPatientRepository() { return patientRepository; }
+    public DoctorRepository getDoctorRepository() { return doctorRepository; }
+    public AppointmentHistoryRepository getHistoryRepository() { return historyRepository; }
+    public AppointmentRepository getAppointmentRepository() { return appointmentRepository; }
+    public QueueRepository getQueueRepository() { return queueRepository; }
+    public PredictionRepository getPredictionRepository() { return predictionRepository; }
+    public ReallocationHistoryRepository getReallocationHistoryRepository() { return reallocationHistoryRepository; }
+    public ReminderRepository getReminderRepository() { return reminderRepository; }
 
-    public DoctorRepository getDoctorRepository() {
-        return doctorRepository;
-    }
+    public static PatientRepository getPatientRepo() { return getInstance().patientRepository; }
+    public static DoctorRepository getDoctorRepo() { return getInstance().doctorRepository; }
+    public static AppointmentHistoryRepository getHistoryRepo() { return getInstance().historyRepository; }
+    public static AppointmentRepository getAppointmentRepo() { return getInstance().appointmentRepository; }
+    public static QueueRepository getQueueRepo() { return getInstance().queueRepository; }
+    public static PredictionRepository getPredictionRepo() { return getInstance().predictionRepository; }
+    public static ReallocationHistoryRepository getReallocationHistoryRepo() { return getInstance().reallocationHistoryRepository; }
+    public static ReminderRepository getReminderRepo() { return getInstance().reminderRepository; }
 
-    public AppointmentHistoryRepository getHistoryRepository() {
-        return historyRepository;
-    }
+    public static PatientRepository patientRepository() { return getInstance().patientRepository; }
+    public static DoctorRepository doctorRepository() { return getInstance().doctorRepository; }
+    public static AppointmentRepository appointmentRepository() { return getInstance().appointmentRepository; }
+    public static QueueRepository queueRepository() { return getInstance().queueRepository; }
+    public static AppointmentHistoryRepository historyRepository() { return getInstance().historyRepository; }
 
-    public AppointmentRepository getAppointmentRepository() {
-        return appointmentRepository;
-    }
-
-    public QueueRepository getQueueRepository() {
-        return queueRepository;
-    }
-
-    public PatientService getPatientService() {
-        return patientService;
-    }
-
-    public DoctorService getDoctorService() {
-        return doctorService;
-    }
-
-    public AppointmentService getAppointmentService() {
-        return appointmentService;
-    }
-
-    public PredictionService getPredictionService() {
-        return predictionService;
-    }
-
-    public com.ghostqueue.prediction.PredictionRepository getPredictionRepository() {
-        return predictionRepository;
-    }
-
-    public QueueService getQueueService() {
-        return queueService;
-    }
-
-    public ReallocationService getReallocationService() {
-        return reallocationService;
-    }
-
-    public AnalyticsService getAnalyticsService() {
-        return analyticsService;
-    }
-
-    public ReminderService getReminderService() {
-        return reminderService;
-    }
-
-    public ReminderRepository getReminderRepository() {
-        return reminderRepository;
-    }
-
-    public SettingsService getSettingsService() {
-        return settingsService;
-    }
+    public PatientService getPatientService() { return patientService; }
+    public DoctorService getDoctorService() { return doctorService; }
+    public AppointmentService getAppointmentService() { return appointmentService; }
+    public PredictionService getPredictionService() { return predictionService; }
+    public QueueService getQueueService() { return queueService; }
+    public ReallocationService getReallocationService() { return reallocationService; }
+    public AnalyticsService getAnalyticsService() { return analyticsService; }
+    public ReminderService getReminderService() { return reminderService; }
+    public SettingsService getSettingsService() { return settingsService; }
+    public NotificationService getNotificationService() { return notificationService; }
 }
-
