@@ -41,6 +41,10 @@ public class RiskClassifier {
         }
     }
 
+    public static RiskLevel classifyDefault(double probability) {
+        return new RiskClassifier().classify(probability);
+    }
+
     public double getLowThreshold() {
         return lowThreshold;
     }

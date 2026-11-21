@@ -33,4 +33,8 @@ public enum Department {
         }
         return GENERAL_MEDICINE;
     }
+
+    public static Department fromDisplayName(String text) {
+        return fromString(text);
+    }
 }

@@ -17,6 +17,8 @@ public class ServiceRegistry {
     private final AppointmentRepository appointmentRepository;
     private final QueueRepository queueRepository;
     private final com.ghostqueue.prediction.PredictionRepository predictionRepository;
+    private final ReallocationHistoryRepository reallocationHistoryRepository;
+    private final ReminderRepository reminderRepository;
 
     private final PatientService patientService;
     private final DoctorService doctorService;
@@ -25,6 +27,8 @@ public class ServiceRegistry {
     private final QueueService queueService;
     private final ReallocationService reallocationService;
     private final AnalyticsService analyticsService;
+    private final ReminderService reminderService;
+    private final SettingsService settingsService;
 
     private ServiceRegistry() {
         LOGGER.info("Initializing GhostQueue ServiceRegistry with JDBC repositories...");
@@ -41,13 +45,15 @@ public class ServiceRegistry {
         this.appointmentRepository = new JdbcAppointmentRepository();
         this.queueRepository = new JdbcQueueRepository();
         this.predictionRepository = new com.ghostqueue.prediction.JdbcPredictionRepository();
+        this.reallocationHistoryRepository = new JdbcReallocationHistoryRepository();
+        this.reminderRepository = new JdbcReminderRepository();
 
         this.patientService = new PatientService(patientRepository);
         this.doctorService = new DoctorService(doctorRepository);
         this.appointmentService = new AppointmentService(appointmentRepository, historyRepository, doctorRepository);
         this.predictionService = new PredictionService(appointmentService, patientService, predictionRepository);
         this.queueService = new QueueService(queueRepository);
-        this.reallocationService = new ReallocationService(appointmentService, queueService);
+        this.reallocationService = new ReallocationService(appointmentService, queueService, reallocationHistoryRepository);
         this.analyticsService = new AnalyticsService(
                 appointmentService,
                 predictionService,
@@ -55,6 +61,19 @@ public class ServiceRegistry {
                 patientService,
                 doctorService
         );
+        this.reminderService = new ReminderService(
+                reminderRepository,
+                appointmentService,
+                patientService,
+                predictionService
+        );
+        this.settingsService = new SettingsService();
+
+        // Sync initial model risk thresholds from persisted settings
+        double highRisk = settingsService.getHighRiskThreshold();
+        double medRisk = settingsService.getMediumRiskThreshold();
+        this.predictionService.getRiskClassifier().setHighThreshold(highRisk);
+        this.predictionService.getRiskClassifier().setLowThreshold(medRisk);
 
         LOGGER.info("GhostQueue ServiceRegistry initialized successfully with active MySQL database integration.");
     }
@@ -116,6 +135,18 @@ public class ServiceRegistry {
 
     public AnalyticsService getAnalyticsService() {
         return analyticsService;
+    }
+
+    public ReminderService getReminderService() {
+        return reminderService;
+    }
+
+    public ReminderRepository getReminderRepository() {
+        return reminderRepository;
+    }
+
+    public SettingsService getSettingsService() {
+        return settingsService;
     }
 }
 

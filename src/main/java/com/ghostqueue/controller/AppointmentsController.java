@@ -231,6 +231,13 @@ public class AppointmentsController {
         applyFilters();
     }
 
+    public void setSearchQuery(String query) {
+        if (searchField != null) {
+            searchField.setText(query);
+            applyFilters();
+        }
+    }
+
     @FXML
     public void handleOpenAddDialog() {
         try {

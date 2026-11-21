@@ -7,39 +7,58 @@ import com.ghostqueue.model.QueuePriority;
 import com.ghostqueue.model.QueueStatus;
 import com.ghostqueue.model.ReallocationSuggestion;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+/**
+ * Intelligent Dynamic Slot Reallocation Engine.
+ * Evaluates open vacant slots (cancelled visits) and high-risk appointment warnings against
+ * waiting queue candidates using multi-factor clinical compatibility scoring.
+ */
 public class ReallocationEngine {
 
-    public List<ReallocationSuggestion> generateRecommendations(List<Appointment> openSlots, List<QueueEntry> waitingQueue) {
+    /**
+     * Evaluates available appointment slots against active queue candidates,
+     * returning prioritized matching recommendations.
+     */
+    public List<ReallocationSuggestion> generateRecommendations(List<Appointment> appointments, List<QueueEntry> waitingQueue) {
         List<ReallocationSuggestion> suggestions = new ArrayList<>();
         int counter = 101;
 
-        for (Appointment slot : openSlots) {
-            // Only consider cancelled slots or predicted high-risk slots
-            boolean isEligibleSlot = (slot.getStatus() == AppointmentStatus.CANCELLED) ||
-                    (slot.getStatus() == AppointmentStatus.CONFIRMED && slot.getPredictedRiskScore() >= 0.75);
+        for (Appointment slot : appointments) {
+            // Determine eligibility: Confirmed vacancy (CANCELLED) OR High-risk prediction warning
+            boolean isCancelled = (slot.getStatus() == AppointmentStatus.CANCELLED);
+            boolean isHighRisk = (slot.getStatus() == AppointmentStatus.CONFIRMED &&
+                    (slot.getPredictedRiskScore() >= 0.65 || slot.getRiskLevel() == com.ghostqueue.model.RiskLevel.HIGH));
 
-            if (!isEligibleSlot) continue;
+            if (!isCancelled && !isHighRisk) {
+                continue;
+            }
 
-            String context = (slot.getStatus() == AppointmentStatus.CANCELLED)
-                    ? "Cancelled Slot"
-                    : "High-Risk Alert (" + slot.getRiskScorePercent() + "%)";
+            String context = isCancelled ? "Confirmed Vacancy (Cancelled Slot)" : "Standby Match (Predicted High-Risk Slot)";
 
-            // Find best matching patient in queue for this department
+            // Filter waiting candidates eligible for this slot
             List<QueueEntry> eligibleCandidates = waitingQueue.stream()
-                    .filter(q -> q.getStatus() == QueueStatus.WAITING || q.getStatus() == QueueStatus.STANDBY)
-                    .filter(q -> q.getRequestedDepartment() == slot.getDepartment())
-                    .sorted(Comparator.comparing(QueueEntry::getPriority)
-                            .thenComparing(QueueEntry::getRegisteredTime))
+                    .filter(q -> q.getStatus() == QueueStatus.WAITING || q.getStatus() == QueueStatus.STANDBY || q.getStatus() == QueueStatus.OFFERED)
+                    .filter(q -> q.getRequestedDepartment() == slot.getDepartment() || q.getRequestedDepartment() == com.ghostqueue.model.Department.ALL)
                     .toList();
 
+            // Rank candidates for this slot by compatibility score descending
+            List<RankedCandidate> ranked = new ArrayList<>();
             for (QueueEntry candidate : eligibleCandidates) {
-                int matchScore = calculateMatchScore(slot, candidate);
-                String matchReason = buildMatchReason(slot, candidate);
+                int score = calculateCompatibilityScore(slot, candidate);
+                String reason = buildCompatibilityReason(slot, candidate);
+                ranked.add(new RankedCandidate(candidate, score, reason));
+            }
 
+            ranked.sort(Comparator.comparingInt(RankedCandidate::score).reversed());
+
+            // Provide top matches for this slot
+            int limit = Math.min(2, ranked.size());
+            for (int i = 0; i < limit; i++) {
+                RankedCandidate rc = ranked.get(i);
                 suggestions.add(new ReallocationSuggestion(
                         "SR-" + (counter++),
                         slot.getId(),
@@ -48,52 +67,100 @@ public class ReallocationEngine {
                         slot.getAppointmentDate(),
                         slot.getAppointmentTime(),
                         context,
-                        candidate,
-                        matchScore,
-                        matchReason,
+                        rc.candidate(),
+                        rc.score(),
+                        rc.reason(),
                         "PENDING"
                 ));
-                break; // Top 1 recommendation per slot
             }
         }
 
+        // Sort overall suggestions by match score descending
+        suggestions.sort(Comparator.comparingInt(ReallocationSuggestion::getMatchScore).reversed());
         return suggestions;
     }
 
-    private int calculateMatchScore(Appointment slot, QueueEntry candidate) {
-        int score = 50; // base score for same department
+    /**
+     * Computes multi-factor clinical compatibility score [0..99]
+     */
+    public int calculateCompatibilityScore(Appointment slot, QueueEntry candidate) {
+        int score = 35; // Base score: Department compatibility
 
-        if (slot.getDoctorName().equalsIgnoreCase(candidate.getPreferredDoctor())) {
+        // 1. Doctor compatibility
+        if (slot.getDoctorName() != null && slot.getDoctorName().equalsIgnoreCase(candidate.getPreferredDoctor())) {
+            score += 25;
+        } else if (candidate.getDoctorId() != null && candidate.getDoctorId().equalsIgnoreCase(slot.getDoctorId())) {
             score += 25;
         }
 
-        if (candidate.getPriority() == QueuePriority.URGENT) {
-            score += 20;
-        } else if (candidate.getPriority() == QueuePriority.HIGH) {
-            score += 12;
-        } else {
-            score += 5;
+        // 2. Date compatibility (slot is on or after candidate requested date)
+        if (slot.getAppointmentDate() != null && candidate.getRequestedDate() != null) {
+            if (!slot.getAppointmentDate().isBefore(candidate.getRequestedDate())) {
+                score += 15;
+            }
         }
 
+        // 3. Time slot preference compatibility
+        if (isTimeCompatible(slot.getAppointmentTime(), candidate.getPreferredTimeSlot())) {
+            score += 10;
+        }
+
+        // 4. Clinical priority triage weighting
+        if (candidate.getPriority() == QueuePriority.URGENT) {
+            score += 15;
+        } else if (candidate.getPriority() == QueuePriority.HIGH) {
+            score += 10;
+        } else {
+            score += 4;
+        }
+
+        // 5. Standby readiness
         if (candidate.getStatus() == QueueStatus.STANDBY) {
-            score += 5; // Ready on short notice
+            score += 5;
         }
 
         return Math.min(99, score);
     }
 
-    private String buildMatchReason(Appointment slot, QueueEntry candidate) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("Direct department match (").append(slot.getDepartment().getDisplayName()).append(")");
-        if (slot.getDoctorName().equalsIgnoreCase(candidate.getPreferredDoctor())) {
-            sb.append("; Requested specialist match");
+    private boolean isTimeCompatible(LocalTime slotTime, String prefSlot) {
+        if (prefSlot == null || prefSlot.isBlank() || prefSlot.toLowerCase().contains("anytime")) {
+            return true;
         }
-        if (candidate.getPriority() == QueuePriority.URGENT) {
-            sb.append("; Clinical urgent priority flag");
+        if (slotTime == null) return true;
+        int hour = slotTime.getHour();
+        if (prefSlot.toLowerCase().contains("morning") && hour < 12) {
+            return true;
         }
-        if (candidate.getStatus() == QueueStatus.STANDBY) {
-            sb.append("; Confirmed standby availability");
+        if (prefSlot.toLowerCase().contains("afternoon") && hour >= 12) {
+            return true;
         }
-        return sb.toString();
+        return false;
     }
+
+    public String buildCompatibilityReason(Appointment slot, QueueEntry candidate) {
+        List<String> reasons = new ArrayList<>();
+        reasons.add("Department match (" + slot.getDepartment().getDisplayName() + ")");
+
+        if (slot.getDoctorName() != null && slot.getDoctorName().equalsIgnoreCase(candidate.getPreferredDoctor())) {
+            reasons.add("Requested specialist match (" + slot.getDoctorName() + ")");
+        }
+
+        if (candidate.getPriority() == QueuePriority.URGENT) {
+            reasons.add("Clinical Urgent Triage priority");
+        } else if (candidate.getPriority() == QueuePriority.HIGH) {
+            reasons.add("High clinical need");
+        }
+
+        if (isTimeCompatible(slot.getAppointmentTime(), candidate.getPreferredTimeSlot())) {
+            reasons.add("Time window aligned (" + candidate.getPreferredTimeSlot() + ")");
+        }
+
+        if (candidate.getStatus() == QueueStatus.STANDBY) {
+            reasons.add("Confirmed standby readiness");
+        }
+
+        return String.join(" • ", reasons);
+    }
+
+    private record RankedCandidate(QueueEntry candidate, int score, String reason) {}
 }

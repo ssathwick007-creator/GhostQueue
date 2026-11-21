@@ -39,6 +39,14 @@ public class QueueEntry implements Comparable<QueueEntry> {
         this.clinicalNote = "Standard waiting triage";
     }
 
+    public QueueEntry(String queueId, String patientId, String doctorId,
+                      LocalDate requestedDate, String preferredTimeSlot,
+                      QueuePriority priority, QueueStatus status,
+                      LocalDateTime registeredTime, String clinicalNote) {
+        this(queueId, patientId, doctorId, requestedDate, preferredTimeSlot, priority, status, registeredTime);
+        this.clinicalNote = clinicalNote != null ? clinicalNote : "Standard triage";
+    }
+
     // Compatibility constructor
     public QueueEntry(String queueId, String patientId, String patientName, String patientPhone,
                       QueuePriority priority, Department requestedDepartment,
@@ -93,6 +101,10 @@ public class QueueEntry implements Comparable<QueueEntry> {
     }
 
     public QueuePriority getPriority() {
+        return priority;
+    }
+
+    public QueuePriority getPriorityLevel() {
         return priority;
     }
 
@@ -154,6 +166,42 @@ public class QueueEntry implements Comparable<QueueEntry> {
 
     public void setClinicalNote(String clinicalNote) {
         this.clinicalNote = clinicalNote;
+    }
+
+    public String getNotes() {
+        return getClinicalNote();
+    }
+
+    public void setNotes(String notes) {
+        setClinicalNote(notes);
+    }
+
+    /**
+     * Transparent administrative prioritization score calculation.
+     * Evaluates strictly clinical urgency and elapsed waiting duration.
+     * Never confuses machine-learning no-show probability with medical urgency.
+     */
+    public int getTransparentPriorityScore() {
+        int base = switch (priority) {
+            case URGENT -> 70;
+            case HIGH -> 45;
+            case STANDARD -> 20;
+            default -> 10;
+        };
+        long hoursWaiting = (registeredTime != null) ? Duration.between(registeredTime, LocalDateTime.now()).toHours() : 0;
+        int timeBonus = (int) Math.min(30, Math.max(0, hoursWaiting));
+        return Math.min(100, Math.max(0, base + timeBonus));
+    }
+
+    public String getPrioritizationExplanation() {
+        String urgencyStr = switch (priority) {
+            case URGENT -> "Clinical Urgent Flag (+70 pts)";
+            case HIGH -> "High Clinical Need (+45 pts)";
+            case STANDARD -> "Routine Outpatient (+20 pts)";
+            default -> "Standard Baseline (+10 pts)";
+        };
+        long hours = (registeredTime != null) ? Duration.between(registeredTime, LocalDateTime.now()).toHours() : 0;
+        return urgencyStr + " • Queue wait: " + hours + " hrs (Score: " + getTransparentPriorityScore() + ")";
     }
 
     public String getWaitingDurationFormatted() {

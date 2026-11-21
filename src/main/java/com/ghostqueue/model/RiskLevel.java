@@ -20,6 +20,20 @@ public enum RiskLevel {
         return label;
     }
 
+    public String getDisplayName() {
+        return label;
+    }
+
+    public static RiskLevel fromString(String text) {
+        if (text == null || text.isBlank()) return ALL;
+        for (RiskLevel rl : values()) {
+            if (rl.name().equalsIgnoreCase(text) || rl.label.equalsIgnoreCase(text)) {
+                return rl;
+            }
+        }
+        return LOW;
+    }
+
     public String getStyleClass() {
         return styleClass;
     }

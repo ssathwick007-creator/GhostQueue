@@ -35,7 +35,7 @@ public class MockAppointmentRepository implements AppointmentRepository {
 
         add(new Appointment("APT-803", "PT-1003", "Maria Gomez", 42, "+1 (555) 345-6789",
                 "Dr. David Kim", Department.NEUROLOGY, today, LocalTime.of(10, 0),
-                AppointmentStatus.IN_CONSULTATION, "Migraine Prophylaxis Assessment", 7,
+                AppointmentStatus.CONFIRMED, "Migraine Prophylaxis Assessment", 7,
                 0.08, List.of("Excellent attendance record")));
 
         add(new Appointment("APT-804", "PT-1004", "David O'Reilly", 51, "+1 (555) 456-7890",
@@ -55,7 +55,7 @@ public class MockAppointmentRepository implements AppointmentRepository {
 
         add(new Appointment("APT-807", "PT-1007", "Chloe Bennett", 33, "+1 (555) 789-0123",
                 "Dr. Thomas Wright", Department.DERMATOLOGY, today, LocalTime.of(14, 0),
-                AppointmentStatus.PENDING, "Severe Atopic Dermatitis Review", 35,
+                AppointmentStatus.BOOKED, "Severe Atopic Dermatitis Review", 35,
                 0.78, List.of("History of missed weekday slots", "Unconfirmed appointment notice")));
 
         add(new Appointment("APT-808", "PT-1008", "Samuel O'Connor", 71, "+1 (555) 890-1234",
@@ -85,7 +85,7 @@ public class MockAppointmentRepository implements AppointmentRepository {
 
         add(new Appointment("APT-813", "PT-1013", "Victoria Ross", 50, "+1 (555) 345-6780",
                 "Dr. David Kim", Department.NEUROLOGY, tomorrow, LocalTime.of(10, 15),
-                AppointmentStatus.PENDING, "Carpal Tunnel EMG Study", 31,
+                AppointmentStatus.BOOKED, "Carpal Tunnel EMG Study", 31,
                 0.84, List.of("3 prior cancellations", "Unverified contact address")));
 
         add(new Appointment("APT-814", "PT-1014", "Daniel Kovacs", 39, "+1 (555) 456-7891",
@@ -120,7 +120,7 @@ public class MockAppointmentRepository implements AppointmentRepository {
 
         add(new Appointment("APT-820", "PT-1010", "Brandon Lee", 58, "+1 (555) 012-3456",
                 "Dr. Michael Chang", Department.ONCOLOGY, today.plusDays(4), LocalTime.of(10, 15),
-                AppointmentStatus.PENDING, "Immunotherapy Tolerance Review", 27,
+                AppointmentStatus.BOOKED, "Immunotherapy Tolerance Review", 27,
                 0.79, List.of("Past no-shows detected", "Long commute transit")));
     }
 

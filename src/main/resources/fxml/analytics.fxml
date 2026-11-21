@@ -5,6 +5,10 @@
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.GridPane?>
@@ -22,39 +26,79 @@
             <Label text="Predictive trends, department capacity utilization, no-show attrition rates and slot recovery metrics" styleClass="card-subtitle" />
         </VBox>
 
+        <!-- FILTER & EXPORT TOOLBAR -->
+        <VBox styleClass="card" spacing="12">
+            <HBox alignment="CENTER_LEFT" spacing="12" wrapText="true">
+                <VBox spacing="2">
+                    <Label text="From Date:" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #77838D;" />
+                    <DatePicker fx:id="startDatePicker" prefWidth="145" promptText="Start Date" />
+                </VBox>
+
+                <VBox spacing="2">
+                    <Label text="To Date:" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #77838D;" />
+                    <DatePicker fx:id="endDatePicker" prefWidth="145" promptText="End Date" />
+                </VBox>
+
+                <VBox spacing="2">
+                    <Label text="Clinical Specialty:" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #77838D;" />
+                    <ComboBox fx:id="departmentFilter" prefWidth="175" />
+                </VBox>
+
+                <VBox spacing="2">
+                    <Label text="Attending Physician:" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #77838D;" />
+                    <ComboBox fx:id="doctorFilter" prefWidth="200" />
+                </VBox>
+
+                <VBox spacing="2" alignment="BOTTOM_LEFT">
+                    <Label text=" " style="-fx-font-size: 11px;" />
+                    <HBox spacing="8">
+                        <Button onAction="#handleApplyFilters" styleClass="btn-secondary" text="Apply Filters" />
+                        <Button onAction="#handleResetFilters" styleClass="btn-secondary" text="Reset" />
+                    </HBox>
+                </VBox>
+
+                <Region HBox.hgrow="ALWAYS" />
+
+                <VBox spacing="2" alignment="BOTTOM_RIGHT">
+                    <Label text=" " style="-fx-font-size: 11px;" />
+                    <Button onAction="#handleExportCsv" styleClass="btn-primary" text="📄 Export Analytics CSV Report" />
+                </VBox>
+            </HBox>
+        </VBox>
+
         <!-- KPI CARDS -->
         <GridPane hgap="16" vgap="16">
             <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="OVERALL ATTENDANCE RATE" styleClass="stat-label" />
-                <Label text="88.4%" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
-                <Label text="+4.2% since predictive standby" styleClass="stat-subtext" />
+                <Label fx:id="attendanceRateLabel" text="88.4%" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
+                <Label fx:id="attendanceSubtextLabel" text="Completed patient consultations" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="HOSPITAL NO-SHOW RATE" styleClass="stat-label" />
-                <Label text="11.6%" styleClass="stat-value" style="-fx-text-fill: #C95F5F;" />
-                <Label text="-3.8% reduction over past quarter" styleClass="stat-subtext" />
+                <Label fx:id="noShowRateLabel" text="11.6%" styleClass="stat-value" style="-fx-text-fill: #C95F5F;" />
+                <Label fx:id="noShowSubtextLabel" text="Unannounced absences" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="SLOT RECLAIM EFFICIENCY" styleClass="stat-label" />
-                <Label text="74.2%" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
-                <Label text="Cancelled slots filled via queue" styleClass="stat-subtext" />
+                <Label fx:id="slotReclaimLabel" text="74.2%" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
+                <Label fx:id="slotReclaimSubtextLabel" text="Cancelled slots filled via queue" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" spacing="4">
-                <Label text="AVG QUEUE CLEARANCE" styleClass="stat-label" />
-                <Label text="18.5 hrs" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
-                <Label text="Average time to slot offer" styleClass="stat-subtext" />
+                <Label text="ACTIVE QUEUE STANDBYS" styleClass="stat-label" />
+                <Label fx:id="queueStandbyLabel" text="8 Patients" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
+                <Label fx:id="queueSubtextLabel" text="Triage patients ready for match" styleClass="stat-subtext" />
             </VBox>
         </GridPane>
 
-        <!-- CHARTS SECTION ROW 1 -->
+        <!-- CHARTS SECTION ROW 1: ATTENDANCE TREND & UTILIZATION -->
         <HBox spacing="18">
             <!-- Monthly Attendance Trend (Line Chart) -->
             <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="12" prefHeight="330">
                 <VBox spacing="2">
-                    <Label text="Attendance vs No-Show Historical Trend (Past 6 Months)" styleClass="card-title" />
+                    <Label text="Attendance vs No-Show Historical Trend (Past Months)" styleClass="card-title" />
                     <Label text="Comparison of completed patient consultations vs unannounced absences" styleClass="card-subtitle" />
                 </VBox>
                 <LineChart fx:id="attendanceTrendChart" prefHeight="260" VBox.vgrow="ALWAYS">
@@ -84,32 +128,68 @@
             </VBox>
         </HBox>
 
-        <!-- INSIGHTS SECTION ROW 2 -->
-        <VBox styleClass="card" spacing="14">
-            <Label text="Predictive Model Behavioral Insights &amp; Clinical Lead-Time Findings" styleClass="card-title" />
+        <!-- CHARTS SECTION ROW 2: RISK DISTRIBUTION & TIME SLOT PEAKS -->
+        <HBox spacing="18">
+            <!-- Risk Level Distribution (Pie Chart) -->
+            <VBox styleClass="card" prefWidth="440" spacing="12" prefHeight="330">
+                <VBox spacing="2">
+                    <Label text="No-Show Risk Distribution" styleClass="card-title" />
+                    <Label text="Current appointment volume segmented by AI predicted risk tier" styleClass="card-subtitle" />
+                </VBox>
+                <PieChart fx:id="riskDistributionChart" legendVisible="true" prefHeight="260" VBox.vgrow="ALWAYS" />
+            </VBox>
 
-            <GridPane hgap="16" vgap="16">
-                <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 16px; -fx-background-radius: 6px;"
-                      GridPane.columnIndex="0" GridPane.hgrow="ALWAYS">
-                    <Label text="Booking Advance Window" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
+            <!-- Hourly Time Window Peak Demand (Bar Chart) -->
+            <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="12" prefHeight="330">
+                <VBox spacing="2">
+                    <Label text="Peak Appointment Time Windows" styleClass="card-title" />
+                    <Label text="Distribution of appointment bookings across operational clinic hours" styleClass="card-subtitle" />
+                </VBox>
+                <BarChart fx:id="timeSlotChart" legendVisible="false" prefHeight="260" VBox.vgrow="ALWAYS">
+                    <xAxis>
+                        <CategoryAxis label="Time Window" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis label="Bookings" />
+                    </yAxis>
+                </BarChart>
+            </VBox>
+        </HBox>
+
+        <!-- CHARTS SECTION ROW 3: DOCTOR WORKLOAD & CLINICAL INSIGHTS -->
+        <HBox spacing="18">
+            <!-- Doctor Workload Distribution (Bar Chart) -->
+            <VBox styleClass="card" HBox.hgrow="ALWAYS" spacing="12" prefHeight="310">
+                <VBox spacing="2">
+                    <Label text="Physician Caseload &amp; Consultation Volume" styleClass="card-title" />
+                    <Label text="Scheduled consultations per attending physician" styleClass="card-subtitle" />
+                </VBox>
+                <BarChart fx:id="doctorWorkloadChart" legendVisible="false" prefHeight="240" VBox.vgrow="ALWAYS">
+                    <xAxis>
+                        <CategoryAxis label="Attending Physician" />
+                    </xAxis>
+                    <yAxis>
+                        <NumberAxis label="Consultations" />
+                    </yAxis>
+                </BarChart>
+            </VBox>
+
+            <!-- Predictive Insights Panel -->
+            <VBox styleClass="card" prefWidth="440" spacing="14" prefHeight="310">
+                <Label text="Predictive Model Insights &amp; Clinical Findings" styleClass="card-title" />
+
+                <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 14px; -fx-background-radius: 6px;">
+                    <Label text="Booking Advance Window Effect" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
                     <Label text="Appointments booked &gt; 21 days in advance demonstrate a 3.4x higher probability of no-show compared to appointments scheduled within 72 hours."
                            styleClass="card-subtitle" wrapText="true" />
                 </VBox>
 
-                <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 16px; -fx-background-radius: 6px;"
-                      GridPane.columnIndex="1" GridPane.hgrow="ALWAYS">
-                    <Label text="Time of Day Sensitivity" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
-                    <Label text="Consultations scheduled after 15:00 show an 18% higher rate of late cancellations. Reallocation engine automatically elevates morning standby queues."
+                <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 14px; -fx-background-radius: 6px;">
+                    <Label text="Standby Queue Reclamation Gain" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
+                    <Label text="Autonomous standby candidate matching recovers an average of 74.2% of cancelled or high-risk vacancy slots, improving clinic utilization."
                            styleClass="card-subtitle" wrapText="true" />
                 </VBox>
-
-                <VBox spacing="6" style="-fx-background-color: #F5F6F4; -fx-padding: 16px; -fx-background-radius: 6px;"
-                      GridPane.columnIndex="2" GridPane.hgrow="ALWAYS">
-                    <Label text="Queue Reallocation Value" style="-fx-font-weight: bold; -fx-font-size: 13px; -fx-text-fill: #172A3A;" />
-                    <Label text="Dynamic reallocation has reclaimed 24 clinical consultation hours this month, preserving physician capacity and shortening elective wait times."
-                           styleClass="card-subtitle" wrapText="true" />
-                </VBox>
-            </GridPane>
-        </VBox>
+            </VBox>
+        </HBox>
     </VBox>
 </ScrollPane>

@@ -58,6 +58,72 @@ public final class DatabaseInitializer {
                         """);
                     }
                 }
+
+                // Ensure Phase 5 reallocation_history table exists
+                try (ResultSet rs = stmt.executeQuery("SHOW TABLES LIKE 'reallocation_history'")) {
+                    if (!rs.next()) {
+                        LOGGER.info("Creating reallocation_history table for Phase 5...");
+                        stmt.executeUpdate("""
+                            CREATE TABLE IF NOT EXISTS reallocation_history (
+                                reallocation_id VARCHAR(64) PRIMARY KEY,
+                                appointment_id VARCHAR(50) NOT NULL,
+                                queue_id VARCHAR(50) NOT NULL,
+                                candidate_patient_id VARCHAR(50) NOT NULL,
+                                doctor_id VARCHAR(50) NOT NULL,
+                                slot_date DATE NOT NULL,
+                                slot_time TIME NOT NULL,
+                                match_score INT NOT NULL,
+                                match_reason VARCHAR(255) NOT NULL,
+                                decision VARCHAR(32) NOT NULL,
+                                decision_notes VARCHAR(255),
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                decided_at TIMESTAMP NULL,
+                                INDEX idx_realloc_decision (decision),
+                                INDEX idx_realloc_date (created_at)
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                        """);
+                    }
+                }
+
+                // Ensure Phase 6 appointment_reminders table exists
+                try (ResultSet rs = stmt.executeQuery("SHOW TABLES LIKE 'appointment_reminders'")) {
+                    if (!rs.next()) {
+                        LOGGER.info("Creating appointment_reminders table for Phase 6...");
+                        stmt.executeUpdate("""
+                            CREATE TABLE IF NOT EXISTS appointment_reminders (
+                                reminder_id VARCHAR(64) PRIMARY KEY,
+                                appointment_id VARCHAR(50) NOT NULL,
+                                patient_id VARCHAR(50) NOT NULL,
+                                reminder_type VARCHAR(32) NOT NULL,
+                                reminder_status VARCHAR(32) NOT NULL,
+                                scheduled_for TIMESTAMP NOT NULL,
+                                completed_at TIMESTAMP NULL,
+                                message_content TEXT NOT NULL,
+                                response_status VARCHAR(64) DEFAULT 'NO_RESPONSE',
+                                operator_notes VARCHAR(255),
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                INDEX idx_reminder_status (reminder_status),
+                                INDEX idx_reminder_scheduled (scheduled_for)
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                        """);
+                    }
+                }
+
+                // Ensure Phase 8 system_settings table exists
+                try (ResultSet rs = stmt.executeQuery("SHOW TABLES LIKE 'system_settings'")) {
+                    if (!rs.next()) {
+                        LOGGER.info("Creating system_settings table for Phase 8...");
+                        stmt.executeUpdate("""
+                            CREATE TABLE IF NOT EXISTS system_settings (
+                                setting_key VARCHAR(64) PRIMARY KEY,
+                                setting_value TEXT NOT NULL,
+                                setting_category VARCHAR(32) NOT NULL,
+                                description VARCHAR(255),
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+                            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+                        """);
+                    }
+                }
                 LOGGER.info("GhostQueue database tables already exist and are active.");
                 return true;
             }

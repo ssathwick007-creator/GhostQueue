@@ -25,6 +25,8 @@ public class AppIntegrationTest {
         private QueueService queueService;
         private ReallocationService reallocationService;
         private AnalyticsService analyticsService;
+        private ReminderService reminderService;
+        private SettingsService settingsService;
 
         @BeforeEach
         void setUp() {
@@ -36,6 +38,20 @@ public class AppIntegrationTest {
                 queueService = registry.getQueueService();
                 reallocationService = registry.getReallocationService();
                 analyticsService = registry.getAnalyticsService();
+                reminderService = registry.getReminderService();
+                settingsService = registry.getSettingsService();
+
+                // Ensure consistent baseline risk thresholds for every test run
+                predictionService.updateRiskThresholds(0.30, 0.65);
+
+                // Ensure seed queue records are in active states for queue and reallocation tests
+                try {
+                        queueService.updateStatus("WQ-104", QueueStatus.STANDBY);
+                        queueService.updateStatus("WQ-106", QueueStatus.OFFERED);
+                        queueService.updateStatus("WQ-108", QueueStatus.WAITING);
+                        queueService.updateStatus("WQ-110", QueueStatus.WAITING);
+                        reallocationService.refreshSuggestions();
+                } catch (Exception ignored) {}
         }
 
         @Test
@@ -49,6 +65,7 @@ public class AppIntegrationTest {
                                 "/fxml/waiting_queue.fxml",
                                 "/fxml/reallocation.fxml",
                                 "/fxml/patient_records.fxml",
+                                "/fxml/reminders.fxml",
                                 "/fxml/analytics.fxml",
                                 "/fxml/settings.fxml",
                                 "/fxml/dialogs/add_appointment_dialog.fxml",
@@ -303,5 +320,169 @@ public class AppIntegrationTest {
                 assertEquals(single.getProbabilityPercent(), fetched.get().getProbabilityPercent());
                 assertFalse(fetched.get().getContributingFactors().isEmpty(),
                                 "Deserialized contributing factors must be intact");
+        }
+
+        @Test
+        @DisplayName("PHASE 4: Verify Waiting Queue Management & Transparent Prioritization")
+        void testQueueServiceAndPrioritization() {
+                List<QueueEntry> allQueue = queueService.getAllQueueEntries();
+                assertFalse(allQueue.isEmpty(), "Waiting queue should contain initial seed records in MySQL");
+
+                // Test prioritization calculation
+                for (QueueEntry entry : allQueue) {
+                        int score = entry.getTransparentPriorityScore();
+                        assertTrue(score >= 0 && score <= 100, "Transparent priority score must be in range [0, 100]");
+                        String expl = entry.getPrioritizationExplanation();
+                        assertNotNull(expl);
+                        assertFalse(expl.isBlank());
+                }
+
+                // Test creating a queue entry
+                String newQueueId = "WQ-TEST-" + (System.currentTimeMillis() % 10000);
+                QueueEntry newEntry = new QueueEntry(
+                                newQueueId, "PT-1001", "DOC-101", LocalDate.now().plusDays(2),
+                                "Morning (08:00 - 12:00)", QueuePriority.URGENT, QueueStatus.WAITING,
+                                LocalDateTime.now(), "Emergency standby evaluation"
+                );
+                queueService.addToQueue(newEntry);
+
+                var retrieved = queueService.getQueueEntryById(newQueueId);
+                assertTrue(retrieved.isPresent(), "Newly added queue entry must be retrievable");
+                assertEquals(QueuePriority.URGENT, retrieved.get().getPriority());
+                assertEquals("Emergency standby evaluation", retrieved.get().getNotes());
+
+                // Urgent priority should have higher priority score
+                assertTrue(retrieved.get().getTransparentPriorityScore() >= 50, "Urgent queue entry score should be >= 50");
+
+                // Test status transition
+                queueService.updateStatus(newQueueId, QueueStatus.OFFERED);
+                var updated = queueService.getQueueEntryById(newQueueId);
+                assertTrue(updated.isPresent());
+                assertEquals(QueueStatus.OFFERED, updated.get().getStatus());
+
+                // Test removal from queue
+                queueService.removeFromQueue(newQueueId);
+                var removed = queueService.getQueueEntryById(newQueueId);
+                assertTrue(removed.isEmpty(), "Deleted queue entry must no longer exist in database");
+        }
+
+        @Test
+        @DisplayName("PHASE 5: Verify Reallocation Engine Scoring & Atomic Approval")
+        void testReallocationEngineAndApproval() {
+                // Find open/cancelled slots and generate recommendations
+                var suggestions = reallocationService.getSuggestions();
+                assertNotNull(suggestions, "Reallocation suggestions must not be null");
+                assertFalse(suggestions.isEmpty(), "Should have candidate reallocation suggestions");
+
+                ReallocationSuggestion topSuggestion = suggestions.get(0);
+                assertTrue(topSuggestion.getMatchScore() > 0, "Compatibility score must be positive");
+                assertNotNull(topSuggestion.getMatchReason(), "Match rationale must be provided");
+                assertNotNull(topSuggestion.getPatientName(), "Candidate patient name must be populated");
+
+                // Test approval execution
+                boolean approved = reallocationService.approveReallocation(topSuggestion.getSuggestionId(), "Verified via integration test");
+                assertTrue(approved, "Reallocation suggestion approval must succeed");
+
+                // Verify reallocation history table contains records in MySQL
+                var history = reallocationService.getReallocationHistory();
+                assertNotNull(history, "Reallocation audit history must be queryable");
+                assertFalse(history.isEmpty(), "Audit history must contain the approved transaction");
+
+                // Restore candidate status so tests remain idempotent
+                try {
+                        queueService.updateStatus(topSuggestion.getCandidatePatient().getQueueId(), QueueStatus.WAITING);
+                } catch (Exception ignored) {}
+        }
+
+        @Test
+        @DisplayName("PHASE 6: Verify Notification & Outreach Reminder Management")
+        void testReminderServiceAndOutreach() {
+                // Generate automated outreach tasks for high-risk visits
+                int generated = reminderService.generateHighRiskReminders();
+                assertTrue(generated >= 0, "Generated count must be non-negative");
+
+                List<AppointmentReminder> reminders = reminderService.getAllReminders();
+                assertFalse(reminders.isEmpty(), "Reminders table should contain active outreach tasks");
+
+                // Verify reminder attributes
+                AppointmentReminder first = reminders.get(0);
+                assertNotNull(first.getReminderId());
+                assertNotNull(first.getAppointmentId());
+                assertNotNull(first.getReminderType());
+                assertNotNull(first.getReminderStatus());
+                assertNotNull(first.getMessageContent());
+
+                // Test response logging (patient confirms attendance)
+                reminderService.markCompleted(first.getReminderId(), "CONFIRMED", "Patient confirmed through automated phone prompt");
+
+                var updated = reminderService.getReminderById(first.getReminderId());
+                assertTrue(updated.isPresent());
+                assertEquals(AppointmentReminder.ReminderStatus.COMPLETED, updated.get().getReminderStatus());
+                assertEquals("CONFIRMED", updated.get().getResponseStatus());
+                assertNotNull(updated.get().getCompletedAt());
+        }
+
+        @Test
+        @DisplayName("PHASE 7: Verify Hospital Analytics Queries & CSV Report Export")
+        void testAnalyticsAndCsvExport() throws Exception {
+                // 1. Verify KPIs
+                var kpis = analyticsService.getFilteredKpis(null, null, Department.ALL, "ALL");
+                assertNotNull(kpis);
+                assertTrue(kpis.totalAppointments() > 0, "Total appointments should be > 0");
+                assertTrue(kpis.attendanceRate() > 0.0, "Attendance rate should be > 0");
+                assertTrue(kpis.noShowRate() >= 0.0, "No show rate should be >= 0");
+
+                // 2. Verify distributions
+                Map<Department, Integer> deptCounts = analyticsService.getDepartmentAppointmentCounts();
+                assertFalse(deptCounts.isEmpty());
+
+                Map<RiskLevel, Integer> riskMap = analyticsService.getRiskDistribution();
+                assertFalse(riskMap.isEmpty());
+                assertTrue(riskMap.containsKey(RiskLevel.HIGH));
+
+                Map<String, Integer> timeSlotMap = analyticsService.getTimeSlotDistribution(null, null, Department.ALL, "ALL");
+                assertFalse(timeSlotMap.isEmpty());
+
+                Map<String, Integer> docWorkload = analyticsService.getDoctorWorkloadDistribution(Department.ALL);
+                assertFalse(docWorkload.isEmpty());
+
+                // 3. Test real CSV report export
+                java.io.File tempCsv = java.io.File.createTempFile("ghostqueue_test_export_", ".csv");
+                tempCsv.deleteOnExit();
+
+                int exportedCount = analyticsService.exportAnalyticsReportToCsv(tempCsv, null, null, Department.ALL, "ALL");
+                assertTrue(exportedCount > 0, "Exported appointment count should be > 0");
+                assertTrue(tempCsv.exists() && tempCsv.length() > 0, "Export file must be created and non-empty");
+
+                // Verify CSV contents
+                String content = java.nio.file.Files.readString(tempCsv.toPath());
+                assertTrue(content.contains("Appointment ID,Patient ID,Patient Name"), "Header line must be present");
+                assertTrue(content.contains("No-Show Probability %"), "Probability header must be present");
+        }
+
+        @Test
+        @DisplayName("PHASE 8: Verify System Settings & Dynamic Threshold Synchronization")
+        void testSettingsServiceAndThresholdSync() {
+                // Verify initial loaded settings
+                String hospitalName = settingsService.getString(SettingsService.KEY_HOSPITAL_NAME, "");
+                assertFalse(hospitalName.isBlank(), "Hospital name setting must be loaded");
+
+                double highThreshold = settingsService.getHighRiskThreshold();
+                double medThreshold = settingsService.getMediumRiskThreshold();
+                assertTrue(highThreshold > medThreshold, "High risk threshold must be > Medium risk threshold");
+
+                // Test saving and updating a setting
+                settingsService.saveSetting("test.param.key", "VerifiedValue", "TEST", "Unit test setting");
+                assertEquals("VerifiedValue", settingsService.getString("test.param.key", ""));
+
+                // Test dynamic threshold update synchronization with prediction engine
+                predictionService.updateRiskThresholds(0.35, 0.70);
+                assertEquals(0.70, predictionService.getRiskClassifier().getHighThreshold(), 0.001);
+                assertEquals(0.35, predictionService.getRiskClassifier().getLowThreshold(), 0.001);
+
+                // Reset back to normal defaults
+                predictionService.updateRiskThresholds(medThreshold, highThreshold);
+                assertEquals(highThreshold, predictionService.getRiskClassifier().getHighThreshold(), 0.001);
+                assertEquals(medThreshold, predictionService.getRiskClassifier().getLowThreshold(), 0.001);
         }
 }

@@ -43,6 +43,8 @@
                             styleClass="nav-button" text="Waiting Queue" />
                     <Button fx:id="navReallocation" maxWidth="Infinity" onAction="#handleNavReallocation"
                             styleClass="nav-button" text="Smart Reallocation" />
+                    <Button fx:id="navReminders" maxWidth="Infinity" onAction="#handleNavReminders"
+                            styleClass="nav-button" text="Reminders &amp; Outreach" />
                     <Button fx:id="navPatients" maxWidth="Infinity" onAction="#handleNavPatients"
                             styleClass="nav-button" text="Patient Records" />
                     <Button fx:id="navAnalytics" maxWidth="Infinity" onAction="#handleNavAnalytics"

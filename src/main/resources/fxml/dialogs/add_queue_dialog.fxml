@@ -56,6 +56,6 @@
 
     <HBox alignment="CENTER_RIGHT" spacing="12">
         <Button onAction="#handleCancel" styleClass="btn-secondary" text="Cancel" />
-        <Button onAction="#handleSave" styleClass="btn-primary" text="Add to Queue" />
+        <Button fx:id="btnSubmit" onAction="#handleSave" styleClass="btn-primary" text="Add to Queue" />
     </HBox>
 </VBox>

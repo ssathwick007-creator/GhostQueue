@@ -8,6 +8,7 @@ import com.ghostqueue.service.QueueService;
 import com.ghostqueue.service.ServiceRegistry;
 import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -26,8 +27,10 @@ public class AddQueueDialogController {
     @FXML private ComboBox<String> timeSlotCombo;
     @FXML private TextField clinicalNoteField;
     @FXML private Label validationMsg;
+    @FXML private Button btnSubmit;
 
     private final QueueService queueService = ServiceRegistry.getInstance().getQueueService();
+    private QueueEntry editEntry;
     private boolean saved = false;
 
     @FXML
@@ -49,6 +52,26 @@ public class AddQueueDialogController {
         timeSlotCombo.getSelectionModel().select(0);
     }
 
+    public void setEditEntry(QueueEntry entry) {
+        this.editEntry = entry;
+        if (entry != null) {
+            nameField.setText(entry.getPatientName());
+            nameField.setDisable(true); // Don't change patient link
+            idField.setText(entry.getPatientId());
+            idField.setDisable(true);
+            phoneField.setText(entry.getPatientPhone());
+            phoneField.setDisable(true);
+            priorityCombo.getSelectionModel().select(entry.getPriority());
+            departmentCombo.getSelectionModel().select(entry.getRequestedDepartment());
+            preferredDoctorField.setText(entry.getPreferredDoctor());
+            timeSlotCombo.getSelectionModel().select(entry.getPreferredTimeSlot());
+            clinicalNoteField.setText(entry.getClinicalNote());
+            if (btnSubmit != null) {
+                btnSubmit.setText("Update Queue Entry");
+            }
+        }
+    }
+
     public boolean isSaved() {
         return saved;
     }
@@ -66,6 +89,18 @@ public class AddQueueDialogController {
 
         if (name == null || name.isBlank() || id == null || id.isBlank()) {
             validationMsg.setText("Patient name and ID are required.");
+            return;
+        }
+
+        if (editEntry != null) {
+            editEntry.setPriority(priority);
+            editEntry.setRequestedDepartment(dept);
+            editEntry.setPreferredDoctor((doc != null && !doc.isBlank()) ? doc.trim() : "Any Available Specialist");
+            editEntry.setPreferredTimeSlot(time);
+            editEntry.setClinicalNote((note != null && !note.isBlank()) ? note.trim() : "Standard waiting triage");
+            queueService.updateQueueEntry(editEntry);
+            saved = true;
+            closeStage();
             return;
         }
 

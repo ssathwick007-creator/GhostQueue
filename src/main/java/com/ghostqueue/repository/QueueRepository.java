@@ -15,6 +15,7 @@ public interface QueueRepository {
     List<QueueEntry> findByPriority(QueuePriority priority);
     List<QueueEntry> findByStatus(QueueStatus status);
     List<QueueEntry> filter(String query, Department department, QueuePriority priority, QueueStatus status);
+    List<QueueEntry> filter(String query, Department department, String doctorId, QueuePriority priority, QueueStatus status);
     void save(QueueEntry entry);
     void update(QueueEntry entry);
     void updateStatus(String queueId, QueueStatus status);

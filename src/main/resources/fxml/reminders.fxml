@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Priority?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<ScrollPane fitToWidth="true" styleClass="scroll-pane" xmlns="http://javafx.com/javafx/21"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.ghostqueue.controller.RemindersController">
+    <VBox spacing="18">
+        <!-- TOP ADVISORY BANNER -->
+        <HBox alignment="CENTER_LEFT" spacing="12" styleClass="banner-notice">
+            <Label text="🔔" style="-fx-font-size: 18px; -fx-text-fill: #168C83; -fx-font-weight: bold;" />
+            <VBox spacing="2" HBox.hgrow="ALWAYS">
+                <Label text="CLINICAL REMINDERS &amp; OUTREACH MANAGEMENT MODULE"
+                       style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #172A3A;" />
+                <Label text="Dispatches targeted multi-channel appointment reminders (SMS, Phone Call, Email) for high-risk patients. Records patient confirmation responses and tracks delivery outcomes."
+                       styleClass="card-subtitle" wrapText="true" />
+            </VBox>
+            <Button onAction="#handleGenerateReminders" styleClass="btn-primary" text="⚡ Generate High-Risk Reminders" />
+        </HBox>
+
+        <!-- STAT METRICS -->
+        <GridPane hgap="16" vgap="16">
+            <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="TOTAL REMINDERS LOGGED" styleClass="stat-label" />
+                <Label fx:id="totalRemindersLabel" text="—" styleClass="stat-value" />
+                <Label text="Historical communication records" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="PENDING OUTREACH TASKS" styleClass="stat-label" />
+                <Label fx:id="pendingRemindersLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
+                <Label text="Scheduled for administrative delivery" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="COMPLETED DELIVERIES" styleClass="stat-label" />
+                <Label fx:id="completedRemindersLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
+                <Label text="Dispatched via SMS / Voice call" styleClass="stat-subtext" />
+            </VBox>
+
+            <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" spacing="4">
+                <Label text="PATIENT CONFIRMATION RATE" styleClass="stat-label" />
+                <Label fx:id="confirmationRateLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
+                <Label text="Attendance verified by patient" styleClass="stat-subtext" />
+            </VBox>
+        </GridPane>
+
+        <!-- REMINDERS TABLE CONTAINER -->
+        <VBox styleClass="card" spacing="14">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2">
+                    <Label text="Patient Reminder &amp; Intervention Communication Registry" styleClass="card-title" />
+                    <Label text="Audit history of automated and manual outreach efforts, message texts, and patient responses" styleClass="card-subtitle" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+                <Label fx:id="recordCountLabel" text="Showing 0 reminders" styleClass="card-subtitle" />
+            </HBox>
+
+            <!-- Filters Toolbar -->
+            <HBox alignment="CENTER_LEFT" spacing="10">
+                <TextField fx:id="searchField" promptText="Filter by patient name, ID, or text..."
+                           styleClass="text-field" prefWidth="260" />
+                <ComboBox fx:id="typeFilter" prefWidth="180" promptText="All Channels" />
+                <ComboBox fx:id="statusFilter" prefWidth="180" promptText="All Statuses" />
+                <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Clear Filters" />
+            </HBox>
+
+            <!-- Table -->
+            <TableView fx:id="remindersTable" prefHeight="450">
+                <columns>
+                    <TableColumn fx:id="colReminderId" text="Reminder ID" prefWidth="105" />
+                    <TableColumn fx:id="colApptId" text="Appt ID" prefWidth="95" />
+                    <TableColumn fx:id="colPatient" text="Patient &amp; Contact" prefWidth="185" />
+                    <TableColumn fx:id="colType" text="Outreach Channel" prefWidth="140" />
+                    <TableColumn fx:id="colScheduled" text="Scheduled For" prefWidth="140" />
+                    <TableColumn fx:id="colStatus" text="Delivery Status" prefWidth="130" />
+                    <TableColumn fx:id="colMessage" text="Message Content / Notice" prefWidth="280" />
+                    <TableColumn fx:id="colResponse" text="Patient Response" prefWidth="150" />
+                    <TableColumn fx:id="colActions" text="Actions" prefWidth="180" />
+                </columns>
+                <placeholder>
+                    <Label text="No clinical reminder records found." styleClass="card-subtitle" />
+                </placeholder>
+            </TableView>
+        </VBox>
+    </VBox>
+</ScrollPane>

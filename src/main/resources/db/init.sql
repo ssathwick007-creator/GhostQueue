@@ -229,3 +229,68 @@ CREATE TABLE IF NOT EXISTS appointment_predictions (
     INDEX idx_pred_predicted_at (predicted_at)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- -------------------------------------------------------------
+-- TABLE: REALLOCATION_HISTORY (PHASE 5 DYNAMIC REALLOCATION ENGINE)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS reallocation_history (
+    reallocation_id VARCHAR(64) PRIMARY KEY,
+    appointment_id VARCHAR(50) NOT NULL,
+    queue_id VARCHAR(50) NOT NULL,
+    candidate_patient_id VARCHAR(50) NOT NULL,
+    doctor_id VARCHAR(50) NOT NULL,
+    slot_date DATE NOT NULL,
+    slot_time TIME NOT NULL,
+    match_score INT NOT NULL,
+    match_reason VARCHAR(255) NOT NULL,
+    decision VARCHAR(32) NOT NULL,
+    decision_notes VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    decided_at TIMESTAMP NULL,
+    INDEX idx_realloc_decision (decision),
+    INDEX idx_realloc_date (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------------
+-- TABLE: APPOINTMENT_REMINDERS (PHASE 6 NOTIFICATION & REMINDER MANAGEMENT)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS appointment_reminders (
+    reminder_id VARCHAR(64) PRIMARY KEY,
+    appointment_id VARCHAR(50) NOT NULL,
+    patient_id VARCHAR(50) NOT NULL,
+    reminder_type VARCHAR(32) NOT NULL,
+    reminder_status VARCHAR(32) NOT NULL,
+    scheduled_for TIMESTAMP NOT NULL,
+    completed_at TIMESTAMP NULL,
+    message_content TEXT NOT NULL,
+    response_status VARCHAR(64) DEFAULT 'NO_RESPONSE',
+    operator_notes VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_reminder_status (reminder_status),
+    INDEX idx_reminder_scheduled (scheduled_for)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- -------------------------------------------------------------
+-- TABLE: SYSTEM_SETTINGS (PHASE 8 ADMINISTRATIVE CONFIGURATION)
+-- -------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS system_settings (
+    setting_key VARCHAR(64) PRIMARY KEY,
+    setting_value TEXT NOT NULL,
+    setting_category VARCHAR(32) NOT NULL,
+    description VARCHAR(255),
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Initial System Settings defaults
+INSERT IGNORE INTO system_settings (setting_key, setting_value, setting_category, description) VALUES
+('hospital.name', 'Metropolitan Academic Medical Center', 'FACILITY', 'Primary hospital display name'),
+('hospital.campus', 'Main Medical Pavilion (North Tower)', 'FACILITY', 'Facility campus or pavilion location'),
+('hospital.hours', '08:00 AM - 17:30 PM (Mon - Sat)', 'FACILITY', 'Clinical operating hours'),
+('hospital.timezone', 'Eastern Time (US & Canada, UTC-05:00)', 'FACILITY', 'Hospital operating timezone'),
+('threshold.high_risk', '0.65', 'PREDICTION', 'Threshold probability for classifying an appointment as High Risk (>= 65%)'),
+('threshold.medium_risk', '0.30', 'PREDICTION', 'Threshold probability for classifying an appointment as Medium Risk (>= 30%)'),
+('reallocation.strict_confirmation', 'true', 'REALLOCATION', 'Require explicit administrative confirmation before reallocating slots'),
+('reallocation.urgent_priority_boost', '20', 'REALLOCATION', 'Compatibility score weight boost for Urgent priority queue entries'),
+('reminders.auto_high_risk', 'true', 'REMINDERS', 'Automatically create reminder tasks for high risk appointments'),
+('reminders.default_lead_hours', '48', 'REMINDERS', 'Hours in advance to dispatch appointment reminders');
+
+

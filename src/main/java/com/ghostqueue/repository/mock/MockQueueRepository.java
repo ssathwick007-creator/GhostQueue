@@ -105,6 +105,11 @@ public class MockQueueRepository implements QueueRepository {
 
     @Override
     public List<QueueEntry> filter(String query, Department department, QueuePriority priority, QueueStatus status) {
+        return filter(query, department, null, priority, status);
+    }
+
+    @Override
+    public List<QueueEntry> filter(String query, Department department, String doctorId, QueuePriority priority, QueueStatus status) {
         return queueEntries.values().stream()
                 .filter(e -> {
                     if (query != null && !query.isBlank()) {
@@ -115,6 +120,9 @@ public class MockQueueRepository implements QueueRepository {
                         if (!matchName && !matchId && !matchDoc) return false;
                     }
                     if (department != null && department != Department.ALL && e.getRequestedDepartment() != department) {
+                        return false;
+                    }
+                    if (doctorId != null && !doctorId.isBlank() && !doctorId.equalsIgnoreCase("All Doctors") && !e.getDoctorId().equalsIgnoreCase(doctorId)) {
                         return false;
                     }
                     if (priority != null && priority != QueuePriority.ALL && e.getPriority() != priority) {

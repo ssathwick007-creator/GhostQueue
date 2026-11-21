@@ -28,6 +28,7 @@ public class MainLayoutController {
     @FXML private Button navPrediction;
     @FXML private Button navQueue;
     @FXML private Button navReallocation;
+    @FXML private Button navReminders;
     @FXML private Button navPatients;
     @FXML private Button navAnalytics;
     @FXML private Button navSettings;
@@ -57,6 +58,7 @@ public class MainLayoutController {
         setupNavIcon(navPrediction, "prediction");
         setupNavIcon(navQueue, "queue");
         setupNavIcon(navReallocation, "reallocation");
+        setupNavIcon(navReminders, "reminders");
         setupNavIcon(navPatients, "patients");
         setupNavIcon(navAnalytics, "analytics");
         setupNavIcon(navSettings, "settings");
@@ -81,6 +83,7 @@ public class MainLayoutController {
             case "prediction" -> handleNavPrediction();
             case "queue" -> handleNavQueue();
             case "reallocation" -> handleNavReallocation();
+            case "reminders" -> handleNavReminders();
             case "patients" -> handleNavPatients();
             case "analytics" -> handleNavAnalytics();
             case "settings" -> handleNavSettings();
@@ -115,6 +118,12 @@ public class MainLayoutController {
     private void handleNavReallocation() {
         setActiveButton(navReallocation);
         loadView("reallocation", "/fxml/reallocation.fxml", "Dynamic Scheduling / Slot Reallocation", "Smart Slot Reallocation");
+    }
+
+    @FXML
+    private void handleNavReminders() {
+        setActiveButton(navReminders);
+        loadView("reminders", "/fxml/reminders.fxml", "Patient Communication / Clinical Outreach", "Patient Reminders & Outreach");
     }
 
     @FXML
@@ -158,6 +167,7 @@ public class MainLayoutController {
         if (button == navPrediction) return "prediction";
         if (button == navQueue) return "queue";
         if (button == navReallocation) return "reallocation";
+        if (button == navReminders) return "reminders";
         if (button == navPatients) return "patients";
         if (button == navAnalytics) return "analytics";
         if (button == navSettings) return "settings";
@@ -193,6 +203,10 @@ public class MainLayoutController {
                 patientCtrl.loadPatients();
             } else if (ctrl instanceof ReallocationController reallocCtrl) {
                 reallocCtrl.loadData();
+            } else if (ctrl instanceof RemindersController remCtrl) {
+                remCtrl.loadData();
+            } else if (ctrl instanceof AnalyticsController analyticsCtrl) {
+                analyticsCtrl.loadData();
             }
 
         } catch (IOException e) {
@@ -208,17 +222,19 @@ public class MainLayoutController {
             handleNavAppointments();
             Object ctrl = controllerCache.get("appointments");
             if (ctrl instanceof AppointmentsController apptCtrl) {
-                // Handled in appointments view
+                apptCtrl.setSearchQuery(query);
             }
         }
     }
 
     @FXML
     private void handleNotificationClick() {
-        NotificationManager.showInfo("Hospital Operational Notifications",
-                "1. [CRITICAL ALERT] 4 High-Risk appointment slots identified for today (Predicted No-Show ≥ 70%). Standby patients alerted.\n\n" +
-                        "2. [REALLOCATION RECOMMENDATION] Cancelled Cardiology slot with Dr. Robert Vance has 1 urgent candidate match (Samuel O'Connor).\n\n" +
-                        "3. [CAPACITY RECOVERY] 74.2% schedule reclamation rate maintained over the last 30 operational days.");
+        handleNavReminders();
+        NotificationManager.showInfo("Active Outreach & Risk Notifications",
+                "Navigated to Reminders & Clinical Outreach.\n\n" +
+                        "• 4 High-Risk appointment slots identified for upcoming schedule.\n" +
+                        "• Standby candidates ready for dynamic slot reallocation.\n" +
+                        "• Multi-channel phone/SMS reminders queued.");
     }
 
     @FXML

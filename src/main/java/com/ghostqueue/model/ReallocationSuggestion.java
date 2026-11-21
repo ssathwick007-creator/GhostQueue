@@ -74,6 +74,10 @@ public class ReallocationSuggestion {
         return matchReason;
     }
 
+    public String getPatientName() {
+        return candidatePatient != null ? candidatePatient.getPatientName() : "";
+    }
+
     public String getStatus() {
         return status;
     }

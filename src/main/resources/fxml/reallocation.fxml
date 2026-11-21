@@ -19,8 +19,9 @@
         <HBox alignment="CENTER_LEFT" spacing="12" styleClass="banner-notice">
             <Label text="⇄" style="-fx-font-size: 18px; -fx-text-fill: #168C83; -fx-font-weight: bold;" />
             <VBox spacing="2" HBox.hgrow="ALWAYS">
-                <Label text="DYNAMIC SLOT REALLOCATION RECOMMENDATION SYSTEM" style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #172A3A;" />
-                <Label text="GhostQueue correlates cancelled slots and high-risk opening predictions with eligible waiting queue patients. All reallocations require explicit operator approval."
+                <Label text="DYNAMIC SLOT REALLOCATION &amp; STANDBY MATCHING ENGINE"
+                       style="-fx-font-weight: bold; -fx-font-size: 12px; -fx-text-fill: #172A3A;" />
+                <Label text="Correlates confirmed cancellations and high-risk opening predictions with waiting queue patients. Requires explicit administrator approval — never automatically cancels or double-books."
                        styleClass="card-subtitle" wrapText="true" />
             </VBox>
             <Button onAction="#handleRefreshSuggestions" styleClass="btn-primary" text="↻ Regenerate Match Suggestions" />
@@ -30,50 +31,50 @@
         <GridPane hgap="16" vgap="16">
             <VBox styleClass="stat-card" GridPane.columnIndex="0" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="VACANT &amp; AT-RISK SLOTS" styleClass="stat-label" />
-                <Label fx:id="openSlotsLabel" text="5" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
+                <Label fx:id="openSlotsLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #D99A42;" />
                 <Label text="Available for patient backfill" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="1" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="MATCH CANDIDATES IDENTIFIED" styleClass="stat-label" />
-                <Label fx:id="matchCandidatesLabel" text="3" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
-                <Label text="Cross-matched by department &amp; urgency" styleClass="stat-subtext" />
+                <Label fx:id="matchCandidatesLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #168C83;" />
+                <Label text="Cross-matched by specialty &amp; urgency" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="2" GridPane.hgrow="ALWAYS" spacing="4">
-                <Label text="AVERAGE MATCH CONFIDENCE" styleClass="stat-label" />
-                <Label text="94.2%" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
-                <Label text="High clinical compatibility score" styleClass="stat-subtext" />
+                <Label text="APPROVED REALLOCATIONS" styleClass="stat-label" />
+                <Label fx:id="approvedCountLabel" text="—" styleClass="stat-value" style="-fx-text-fill: #438B70;" />
+                <Label text="Cumulative recovered patient visits" styleClass="stat-subtext" />
             </VBox>
 
             <VBox styleClass="stat-card" GridPane.columnIndex="3" GridPane.hgrow="ALWAYS" spacing="4">
                 <Label text="SCHEDULE RECOVERY EFFICIENCY" styleClass="stat-label" />
-                <Label text="74.2%" styleClass="stat-value" />
+                <Label fx:id="recoveryEfficiencyLabel" text="—" styleClass="stat-value" />
                 <Label text="Preserves clinical operating capacity" styleClass="stat-subtext" />
             </VBox>
         </GridPane>
 
-        <!-- SPLIT PANEL: SUGGESTIONS TABLE -->
+        <!-- SECTION 1: ACTIVE RECOMMENDATIONS TABLE -->
         <VBox styleClass="card" spacing="14">
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <VBox spacing="2">
-                    <Label text="Active Reallocation Recommendations" styleClass="card-title" />
-                    <Label text="Pairings between open appointment slots and highest-priority waiting candidates" styleClass="card-subtitle" />
+                    <Label text="Active Reallocation Recommendations &amp; Candidate Rankings" styleClass="card-title" />
+                    <Label text="Pairings between open appointment slots and highest-priority waiting candidates with compatibility explanations" styleClass="card-subtitle" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
             </HBox>
 
-            <TableView fx:id="suggestionsTable" prefHeight="300">
+            <TableView fx:id="suggestionsTable" prefHeight="280">
                 <columns>
                     <TableColumn fx:id="colSugId" text="Match ID" prefWidth="85" />
-                    <TableColumn fx:id="colSlotInfo" text="Slot Opportunity" prefWidth="200" />
-                    <TableColumn fx:id="colSlotContext" text="Slot Reason" prefWidth="130" />
-                    <TableColumn fx:id="colCandidate" text="Recommended Patient" prefWidth="180" />
+                    <TableColumn fx:id="colSlotInfo" text="Slot Opportunity" prefWidth="190" />
+                    <TableColumn fx:id="colSlotContext" text="Slot Reason" prefWidth="155" />
+                    <TableColumn fx:id="colCandidate" text="Recommended Patient" prefWidth="175" />
                     <TableColumn fx:id="colCandidatePriority" text="Queue Priority" prefWidth="120" />
-                    <TableColumn fx:id="colMatchScore" text="Match Score" prefWidth="110" />
-                    <TableColumn fx:id="colMatchReason" text="Clinical Rationale" prefWidth="280" />
-                    <TableColumn fx:id="colStatus" text="Status" prefWidth="110" />
-                    <TableColumn fx:id="colActions" text="Decision Actions" prefWidth="170" />
+                    <TableColumn fx:id="colMatchScore" text="Match Score" prefWidth="105" />
+                    <TableColumn fx:id="colMatchReason" text="Clinical Rationale" prefWidth="290" />
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100" />
+                    <TableColumn fx:id="colActions" text="Decision Actions" prefWidth="180" />
                 </columns>
                 <placeholder>
                     <Label text="No active slot reallocation recommendations at this time." styleClass="card-subtitle" />
@@ -81,12 +82,12 @@
             </TableView>
         </VBox>
 
-        <!-- VACANT & CANCELLED SLOTS AUDIT -->
+        <!-- SECTION 2: OPEN & HIGH-RISK SLOTS AUDIT -->
         <VBox styleClass="card" spacing="14">
             <HBox alignment="CENTER_LEFT" spacing="12">
                 <VBox spacing="2">
                     <Label text="Available / Vacant Slots Inventory" styleClass="card-title" />
-                    <Label text="Cancelled appointments and high-risk slots eligible for reallocation" styleClass="card-subtitle" />
+                    <Label text="Cancelled appointments (confirmed vacant) and predicted high-risk visits eligible for standby backfill" styleClass="card-subtitle" />
                 </VBox>
                 <Region HBox.hgrow="ALWAYS" />
             </HBox>
@@ -94,14 +95,42 @@
             <TableView fx:id="openSlotsTable" prefHeight="220">
                 <columns>
                     <TableColumn fx:id="colOpenId" text="Slot ID" prefWidth="95" />
-                    <TableColumn fx:id="colOpenDoctor" text="Physician" prefWidth="180" />
-                    <TableColumn fx:id="colOpenDept" text="Specialty" prefWidth="160" />
-                    <TableColumn fx:id="colOpenTime" text="Date &amp; Time" prefWidth="160" />
-                    <TableColumn fx:id="colOpenStatus" text="Current Status" prefWidth="140" />
-                    <TableColumn fx:id="colOpenRisk" text="Risk Profile" prefWidth="150" />
+                    <TableColumn fx:id="colOpenDoctor" text="Physician" prefWidth="175" />
+                    <TableColumn fx:id="colOpenDept" text="Specialty" prefWidth="150" />
+                    <TableColumn fx:id="colOpenTime" text="Date &amp; Time" prefWidth="150" />
+                    <TableColumn fx:id="colOpenStatus" text="Current Status" prefWidth="130" />
+                    <TableColumn fx:id="colOpenRisk" text="Risk Profile" prefWidth="140" />
                 </columns>
                 <placeholder>
                     <Label text="No open or vacant slots." styleClass="card-subtitle" />
+                </placeholder>
+            </TableView>
+        </VBox>
+
+        <!-- SECTION 3: REALLOCATION DECISION HISTORY AUDIT TRAIL -->
+        <VBox styleClass="card" spacing="14">
+            <HBox alignment="CENTER_LEFT" spacing="12">
+                <VBox spacing="2">
+                    <Label text="Reallocation Decision History &amp; Audit Trail" styleClass="card-title" />
+                    <Label text="Immutable log of approved slot backfills, standby assignments, and operator decisions" styleClass="card-subtitle" />
+                </VBox>
+                <Region HBox.hgrow="ALWAYS" />
+            </HBox>
+
+            <TableView fx:id="historyTable" prefHeight="220">
+                <columns>
+                    <TableColumn fx:id="colHistId" text="Record ID" prefWidth="100" />
+                    <TableColumn fx:id="colHistAppt" text="Slot Appt" prefWidth="100" />
+                    <TableColumn fx:id="colHistPatient" text="Reallocated Patient" prefWidth="170" />
+                    <TableColumn fx:id="colHistDoctor" text="Physician &amp; Dept" prefWidth="170" />
+                    <TableColumn fx:id="colHistTime" text="Slot Time" prefWidth="140" />
+                    <TableColumn fx:id="colHistScore" text="Match Score" prefWidth="95" />
+                    <TableColumn fx:id="colHistDecision" text="Decision" prefWidth="160" />
+                    <TableColumn fx:id="colHistNotes" text="Operator Notes / Rationale" prefWidth="250" />
+                    <TableColumn fx:id="colHistDate" text="Decided At" prefWidth="140" />
+                </columns>
+                <placeholder>
+                    <Label text="No previous reallocation decisions recorded in database." styleClass="card-subtitle" />
                 </placeholder>
             </TableView>
         </VBox>

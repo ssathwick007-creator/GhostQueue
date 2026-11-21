@@ -56,27 +56,29 @@
             </HBox>
 
             <!-- Filters -->
-            <HBox alignment="CENTER_LEFT" spacing="12">
+            <HBox alignment="CENTER_LEFT" spacing="10">
                 <TextField fx:id="searchField" promptText="Filter by patient name, ID, or doctor..."
-                           styleClass="text-field" prefWidth="280" />
-                <ComboBox fx:id="deptFilter" prefWidth="180" promptText="All Departments" />
-                <ComboBox fx:id="priorityFilter" prefWidth="160" promptText="All Priorities" />
-                <ComboBox fx:id="statusFilter" prefWidth="160" promptText="All Queue Statuses" />
+                           styleClass="text-field" prefWidth="240" />
+                <ComboBox fx:id="deptFilter" prefWidth="160" promptText="All Departments" />
+                <ComboBox fx:id="doctorFilter" prefWidth="170" promptText="All Doctors" />
+                <ComboBox fx:id="priorityFilter" prefWidth="150" promptText="All Priorities" />
+                <ComboBox fx:id="statusFilter" prefWidth="150" promptText="All Queue Statuses" />
                 <Button onAction="#handleClearFilters" styleClass="btn-secondary" text="Clear Filters" />
             </HBox>
 
             <!-- Table -->
-            <TableView fx:id="queueTable" prefHeight="440">
+            <TableView fx:id="queueTable" prefHeight="450">
                 <columns>
-                    <TableColumn fx:id="colQueueId" text="Queue ID" prefWidth="90" />
-                    <TableColumn fx:id="colPatient" text="Patient Name" prefWidth="160" />
-                    <TableColumn fx:id="colPriority" text="Priority" prefWidth="120" />
-                    <TableColumn fx:id="colDept" text="Requested Dept" prefWidth="150" />
-                    <TableColumn fx:id="colPrefDoctor" text="Preferred Doctor" prefWidth="160" />
-                    <TableColumn fx:id="colPrefTime" text="Time Window" prefWidth="130" />
-                    <TableColumn fx:id="colWaitDuration" text="Wait Time" prefWidth="110" />
-                    <TableColumn fx:id="colStatus" text="Queue Status" prefWidth="130" />
-                    <TableColumn fx:id="colActions" text="Actions" prefWidth="170" />
+                    <TableColumn fx:id="colQueueId" text="Queue ID" prefWidth="85" />
+                    <TableColumn fx:id="colPatient" text="Patient Name" prefWidth="155" />
+                    <TableColumn fx:id="colPriority" text="Clinical Priority" prefWidth="125" />
+                    <TableColumn fx:id="colScore" text="Triage Prioritization" prefWidth="200" />
+                    <TableColumn fx:id="colDept" text="Requested Dept" prefWidth="140" />
+                    <TableColumn fx:id="colPrefDoctor" text="Specialist Preference" prefWidth="150" />
+                    <TableColumn fx:id="colPrefTime" text="Time Window" prefWidth="125" />
+                    <TableColumn fx:id="colWaitDuration" text="Wait Time" prefWidth="100" />
+                    <TableColumn fx:id="colStatus" text="Queue Status" prefWidth="120" />
+                    <TableColumn fx:id="colActions" text="Actions" prefWidth="190" />
                 </columns>
                 <placeholder>
                     <Label text="No waiting queue patients found." styleClass="card-subtitle" />

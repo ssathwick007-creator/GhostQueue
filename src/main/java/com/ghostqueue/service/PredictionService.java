@@ -129,6 +129,21 @@ public class PredictionService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Updates the underlying prediction engine classification thresholds dynamically
+     * and recalibrates active appointment predictions.
+     */
+    public synchronized void updateRiskThresholds(double lowThreshold, double highThreshold) {
+        LOGGER.info(String.format("Updating risk thresholds dynamically: Low=%.2f, High=%.2f", lowThreshold, highThreshold));
+        predictionEngine.getRiskClassifier().setLowThreshold(lowThreshold);
+        predictionEngine.getRiskClassifier().setHighThreshold(highThreshold);
+        runBatchRecalibration();
+    }
+
+    public RiskClassifier getRiskClassifier() {
+        return predictionEngine.getRiskClassifier();
+    }
+
     public PredictionRecord toRecord(PredictionResult res) {
         List<String> factorStrings = res.getContributingFactors().stream()
                 .map(FactorExplanation::getDescription)

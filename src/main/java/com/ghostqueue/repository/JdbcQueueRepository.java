@@ -21,7 +21,7 @@ public class JdbcQueueRepository implements QueueRepository {
 
     private static final String BASE_SELECT = """
         SELECT w.queue_id, w.patient_id, w.doctor_id, w.requested_date, w.preferred_time,
-               w.priority_level, w.queue_status, w.created_at,
+               w.priority_level, w.queue_status, w.notes, w.created_at,
                p.full_name AS patient_name, p.phone AS patient_phone,
                d.full_name AS doctor_name, d.department AS doctor_department
         FROM waiting_queue w
@@ -141,6 +141,11 @@ public class JdbcQueueRepository implements QueueRepository {
 
     @Override
     public List<QueueEntry> filter(String query, Department department, QueuePriority priority, QueueStatus status) {
+        return filter(query, department, null, priority, status);
+    }
+
+    @Override
+    public List<QueueEntry> filter(String query, Department department, String doctorId, QueuePriority priority, QueueStatus status) {
         StringBuilder sql = new StringBuilder(BASE_SELECT).append(" WHERE 1=1 ");
         List<String> params = new ArrayList<>();
 
@@ -156,6 +161,11 @@ public class JdbcQueueRepository implements QueueRepository {
         if (department != null && department != Department.ALL) {
             sql.append(" AND LOWER(d.department) = LOWER(?)");
             params.add(department.getDisplayName());
+        }
+
+        if (doctorId != null && !doctorId.isBlank() && !doctorId.equalsIgnoreCase("All Doctors")) {
+            sql.append(" AND w.doctor_id = ?");
+            params.add(doctorId);
         }
 
         if (priority != null && priority != QueuePriority.ALL) {
@@ -192,8 +202,8 @@ public class JdbcQueueRepository implements QueueRepository {
     @Override
     public void save(QueueEntry entry) {
         String sql = """
-            INSERT INTO waiting_queue (queue_id, patient_id, doctor_id, requested_date, preferred_time, priority_level, queue_status, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO waiting_queue (queue_id, patient_id, doctor_id, requested_date, preferred_time, priority_level, queue_status, notes, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """;
 
         try (Connection conn = DatabaseConnection.getConnection();
@@ -206,7 +216,8 @@ public class JdbcQueueRepository implements QueueRepository {
             ps.setString(5, entry.getPreferredTimeSlot());
             ps.setString(6, entry.getPriority().name());
             ps.setString(7, entry.getStatus().name());
-            ps.setTimestamp(8, Timestamp.valueOf(entry.getRegisteredTime() != null ? entry.getRegisteredTime() : LocalDateTime.now()));
+            ps.setString(8, entry.getNotes() != null ? entry.getNotes() : "Standard waiting queue entry");
+            ps.setTimestamp(9, Timestamp.valueOf(entry.getRegisteredTime() != null ? entry.getRegisteredTime() : LocalDateTime.now()));
 
             ps.executeUpdate();
             LOGGER.info("Saved queue entry: " + entry.getQueueId());
@@ -220,7 +231,7 @@ public class JdbcQueueRepository implements QueueRepository {
     public void update(QueueEntry entry) {
         String sql = """
             UPDATE waiting_queue
-            SET doctor_id = ?, requested_date = ?, preferred_time = ?, priority_level = ?, queue_status = ?
+            SET doctor_id = ?, requested_date = ?, preferred_time = ?, priority_level = ?, queue_status = ?, notes = ?
             WHERE queue_id = ?
         """;
 
@@ -232,7 +243,8 @@ public class JdbcQueueRepository implements QueueRepository {
             ps.setString(3, entry.getPreferredTimeSlot());
             ps.setString(4, entry.getPriority().name());
             ps.setString(5, entry.getStatus().name());
-            ps.setString(6, entry.getQueueId());
+            ps.setString(6, entry.getNotes() != null ? entry.getNotes() : "Standard waiting queue entry");
+            ps.setString(7, entry.getQueueId());
 
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -300,7 +312,7 @@ public class JdbcQueueRepository implements QueueRepository {
 
     @Override
     public int countUrgentPriority() {
-        return executeCount("SELECT COUNT(*) FROM waiting_queue WHERE priority_level = 'URGENT' AND queue_status IN ('WAITING', 'STANDBY')");
+        return executeCount("SELECT COUNT(*) FROM waiting_queue WHERE priority_level = 'URGENT' AND queue_status IN ('WAITING', 'STANDBY', 'OFFERED')");
     }
 
     private int executeCount(String sql) {
@@ -334,7 +346,8 @@ public class JdbcQueueRepository implements QueueRepository {
         entry.setPreferredDoctor(docName != null ? docName : "Any Available Specialist");
         String dept = rs.getString("doctor_department");
         entry.setRequestedDepartment(dept != null ? Department.fromString(dept) : Department.GENERAL_MEDICINE);
-        entry.setClinicalNote("Triage registered at " + registered.toLocalDate());
+        String notes = rs.getString("notes");
+        entry.setClinicalNote(notes != null && !notes.isBlank() ? notes : "Triage registered at " + registered.toLocalDate());
 
         return entry;
     }

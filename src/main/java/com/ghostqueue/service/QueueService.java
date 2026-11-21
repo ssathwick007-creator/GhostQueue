@@ -45,6 +45,17 @@ public class QueueService {
         return queueRepository.filter(query, department, priority, status);
     }
 
+    public List<QueueEntry> filterQueue(String query, Department department, String doctorId, QueuePriority priority, QueueStatus status) {
+        return queueRepository.filter(query, department, doctorId, priority, status);
+    }
+
+    public void updateQueueEntry(QueueEntry entry) {
+        if (entry == null || entry.getQueueId() == null) {
+            throw new IllegalArgumentException("Queue entry and ID must not be null.");
+        }
+        queueRepository.update(entry);
+    }
+
     public void addToQueue(QueueEntry entry) {
         if (entry == null) {
             throw new IllegalArgumentException("Queue entry cannot be null.");
