@@ -23,14 +23,16 @@ public class AccountManagementController {
         private String role;
         private boolean isApproved;
         private String status;
+        private String lastActive;
 
-        public ProfileItem(String id, String email, String fullName, String role, boolean isApproved, String status) {
+        public ProfileItem(String id, String email, String fullName, String role, boolean isApproved, String status, String lastActive) {
             this.id = id;
             this.email = email;
             this.fullName = fullName;
             this.role = role;
             this.isApproved = isApproved;
             this.status = status;
+            this.lastActive = lastActive;
         }
 
         public String getId() { return id; }
@@ -39,9 +41,11 @@ public class AccountManagementController {
         public String getRole() { return role; }
         public boolean isApproved() { return isApproved; }
         public String getStatus() { return status; }
+        public String getLastActive() { return lastActive; }
 
         public void setApproved(boolean approved) { isApproved = approved; }
         public void setStatus(String status) { this.status = status; }
+        public void setLastActive(String lastActive) { this.lastActive = lastActive; }
     }
 
     @FXML private Label totalProfilesLabel;
@@ -59,6 +63,7 @@ public class AccountManagementController {
     @FXML private TableColumn<ProfileItem, String> colRole;
     @FXML private TableColumn<ProfileItem, String> colApproval;
     @FXML private TableColumn<ProfileItem, String> colStatus;
+    @FXML private TableColumn<ProfileItem, String> colLastActive;
     @FXML private TableColumn<ProfileItem, Void> colActions;
 
     private final ObservableList<ProfileItem> tableData = FXCollections.observableArrayList();
@@ -76,6 +81,7 @@ public class AccountManagementController {
             return new javafx.beans.property.SimpleStringProperty(approved ? "APPROVED" : "PENDING APPROVAL");
         });
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colLastActive.setCellValueFactory(new PropertyValueFactory<>("lastActive"));
 
         setupActionsColumn();
 
@@ -167,17 +173,19 @@ public class AccountManagementController {
                 String email = (String) r.get("email");
                 String fullName = (String) r.get("full_name");
                 String role = (String) r.get("role");
-                boolean approved = Boolean.TRUE.equals(r.get("is_approved"));
-                String status = (String) r.getOrDefault("status", "ACTIVE");
+                String status = (String) r.getOrDefault("account_status", r.getOrDefault("status", "ACTIVE"));
+                boolean approved = !"PENDING_APPROVAL".equalsIgnoreCase(status);
+                String lastLogin = (String) r.get("last_login_at");
+                String lastActive = formatTimestamp(lastLogin);
 
                 if ("DOCTOR".equalsIgnoreCase(role)) {
-                    if (approved) approvedDocs++;
-                    else pendingDocs++;
+                    if (approved && "ACTIVE".equalsIgnoreCase(status)) approvedDocs++;
+                    else if ("PENDING_APPROVAL".equalsIgnoreCase(status)) pendingDocs++;
                 } else if ("PATIENT".equalsIgnoreCase(role)) {
                     patients++;
                 }
 
-                masterData.add(new ProfileItem(id, email, fullName, role, approved, status));
+                masterData.add(new ProfileItem(id, email, fullName, role, approved, status, lastActive));
             }
 
             totalProfilesLabel.setText(String.valueOf(total));
@@ -194,9 +202,10 @@ public class AccountManagementController {
         CompletableFuture.runAsync(() -> {
             try {
                 Map<String, Object> updates = new HashMap<>();
-                updates.put("is_approved", true);
-                updates.put("status", "ACTIVE");
+                updates.put("account_status", "ACTIVE");
                 client.patch(SupabaseConfig.getRestEndpoint("profiles"), Map.of("id", "eq." + item.getId()), updates);
+                // Also update doctor's record if present
+                client.patch(SupabaseConfig.getRestEndpoint("doctors"), Map.of("profile_id", "eq." + item.getId()), updates);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -211,8 +220,9 @@ public class AccountManagementController {
         CompletableFuture.runAsync(() -> {
             try {
                 Map<String, Object> updates = new HashMap<>();
-                updates.put("status", "SUSPENDED");
+                updates.put("account_status", "SUSPENDED");
                 client.patch(SupabaseConfig.getRestEndpoint("profiles"), Map.of("id", "eq." + item.getId()), updates);
+                client.patch(SupabaseConfig.getRestEndpoint("doctors"), Map.of("profile_id", "eq." + item.getId()), updates);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -227,8 +237,9 @@ public class AccountManagementController {
         CompletableFuture.runAsync(() -> {
             try {
                 Map<String, Object> updates = new HashMap<>();
-                updates.put("status", "ACTIVE");
+                updates.put("account_status", "ACTIVE");
                 client.patch(SupabaseConfig.getRestEndpoint("profiles"), Map.of("id", "eq." + item.getId()), updates);
+                client.patch(SupabaseConfig.getRestEndpoint("doctors"), Map.of("profile_id", "eq." + item.getId()), updates);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -236,6 +247,23 @@ public class AccountManagementController {
             NotificationManager.showSuccess("Account Reactivated", item.getFullName() + "'s access has been restored.");
             loadData();
         }));
+    }
+
+    private String formatTimestamp(String isoTimestamp) {
+        if (isoTimestamp == null || isoTimestamp.isBlank()) {
+            return "Never";
+        }
+        try {
+            // ISO format: 2026-11-24T12:19:51.123456+00:00 or similar
+            String clean = isoTimestamp.replace("Z", "+00:00");
+            if (clean.length() > 19) {
+                clean = clean.substring(0, 19);
+            }
+            java.time.LocalDateTime dt = java.time.LocalDateTime.parse(clean);
+            return dt.format(java.time.format.DateTimeFormatter.ofPattern("MMM dd, HH:mm"));
+        } catch (Exception e) {
+            return isoTimestamp.length() > 16 ? isoTimestamp.substring(0, 16).replace("T", " ") : isoTimestamp;
+        }
     }
 
     private void applyFilter() {

@@ -5,6 +5,7 @@ import com.ghostqueue.util.JsonUtil;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -117,6 +118,33 @@ public class SupabaseAuthService {
         SupabaseSession session = new SupabaseSession(userId, userEmail, fullName, phone, role, accountStatus, entityId, accessToken, refreshToken, expiresAt);
         SessionManager.getInstance().setSession(session, rememberMe);
         LOGGER.info("Supabase authenticated: " + userEmail + " as " + role + " (Status: " + accountStatus + ", Entity: " + entityId + ")");
+
+        // Asynchronously update last_login_at and write audit trail
+        final String finalUserId = userId;
+        final String finalEmail = userEmail;
+        final String finalRole = role;
+        CompletableFuture.runAsync(() -> {
+            try {
+                String nowIso = Instant.now().toString();
+                // 1. Update last_login_at on profiles table
+                Map<String, Object> update = new HashMap<>();
+                update.put("last_login_at", nowIso);
+                update.put("updated_at", nowIso);
+                client.patch(SupabaseConfig.getRestEndpoint("profiles"), Map.of("id", "eq." + finalUserId), update);
+
+                // 2. Record audit log
+                Map<String, Object> log = new HashMap<>();
+                log.put("user_id", finalUserId);
+                log.put("action", "USER_LOGIN");
+                log.put("entity_type", "SESSION");
+                log.put("entity_id", finalUserId);
+                log.put("details", "Successful login: " + finalEmail + " (" + finalRole + ")");
+                client.post(SupabaseConfig.getRestEndpoint("audit_logs"), log);
+            } catch (Exception e) {
+                LOGGER.log(Level.FINE, "Login telemetry skipped: " + e.getMessage());
+            }
+        });
+
         return session;
     }
 
