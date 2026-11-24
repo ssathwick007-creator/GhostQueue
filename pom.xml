@@ -41,12 +41,19 @@
             <version>${javafx.version}</version>
         </dependency>
 
-        <!-- Future MySQL Database Integration -->
+        <!-- MySQL Database Integration -->
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>9.1.0</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Official MongoDB Driver -->
+        <dependency>
+            <groupId>org.mongodb</groupId>
+            <artifactId>mongodb-driver-sync</artifactId>
+            <version>5.1.0</version>
         </dependency>
 
         <!-- JUnit 5 for Automated Verification -->
