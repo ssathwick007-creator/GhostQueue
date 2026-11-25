@@ -1,22 +1,14 @@
 package com.ghostqueue.service;
 
-import com.ghostqueue.util.DatabaseConnection;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Service managing administrative system configuration, hospital operating parameters,
- * and predictive risk thresholds persisted in MySQL system_settings.
+ * and predictive risk thresholds in a fast, resilient thread-safe cache.
  */
 public class SettingsService {
 
@@ -36,31 +28,13 @@ public class SettingsService {
     private final Map<String, String> cache = new ConcurrentHashMap<>();
 
     public SettingsService() {
-        loadSettings();
+        populateDefaultCache();
     }
 
     /**
-     * Loads all settings from MySQL system_settings table into memory cache.
+     * Loads baseline settings into the in-memory cache.
      */
     public synchronized void loadSettings() {
-        String sql = "SELECT setting_key, setting_value FROM system_settings";
-        try (Connection conn = DatabaseConnection.getConnection();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
-
-            while (rs.next()) {
-                String key = rs.getString("setting_key");
-                String val = rs.getString("setting_value");
-                if (key != null && val != null) {
-                    cache.put(key, val);
-                }
-            }
-            LOGGER.info("Loaded " + cache.size() + " system settings from database.");
-        } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Error loading system_settings from database: " + e.getMessage());
-            populateDefaultCache();
-        }
-
         if (cache.isEmpty()) {
             populateDefaultCache();
         }
@@ -130,34 +104,18 @@ public class SettingsService {
     }
 
     /**
-     * Persists or updates a single setting key in MySQL and updates in-memory cache.
+     * Persists or updates a single setting key in memory cache.
      */
     public synchronized void saveSetting(String key, String value, String category, String description) {
         cache.put(key, value);
-
-        String sql = """
-            INSERT INTO system_settings (setting_key, setting_value, setting_category, description)
-            VALUES (?, ?, ?, ?)
-            ON DUPLICATE KEY UPDATE setting_value = VALUES(setting_value), updated_at = CURRENT_TIMESTAMP
-        """;
-
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            ps.setString(1, key);
-            ps.setString(2, value);
-            ps.setString(3, category != null ? category : "SYSTEM");
-            ps.setString(4, description != null ? description : "Administrative configuration");
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            LOGGER.log(Level.SEVERE, "Error persisting setting [" + key + "]: " + e.getMessage(), e);
-        }
+        LOGGER.info("Setting updated: [" + key + " = " + value + "]");
     }
 
     /**
-     * Persists a batch of settings keys in MySQL.
+     * Persists a batch of settings keys.
      */
     public synchronized void saveSettings(Map<String, String> settings) {
+        if (settings == null) return;
         for (Map.Entry<String, String> entry : settings.entrySet()) {
             String key = entry.getKey();
             String val = entry.getValue();
@@ -179,6 +137,5 @@ public class SettingsService {
      */
     public synchronized void resetToDefaults() {
         populateDefaultCache();
-        saveSettings(cache);
     }
 }
