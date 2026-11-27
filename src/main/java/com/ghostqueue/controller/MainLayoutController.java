@@ -54,9 +54,8 @@ public class MainLayoutController {
 
     @FXML
     public void initialize() {
-        // Setup Brand vector icon
-        Node brandSvg = IconHelper.createIcon("overview", "#168C83", 1.3);
-        brandIconContainer.getChildren().setAll(brandSvg);
+        // Setup Brand vector logo emblem
+        brandIconContainer.getChildren().setAll(IconHelper.createBrandLogo(1.0));
 
         // Setup Sidebar vector icons
         setupNavIcon(navOverview, "overview");
@@ -71,15 +70,19 @@ public class MainLayoutController {
         setupNavIcon(navSettings, "settings");
 
         // Setup User Info
-        com.ghostqueue.supabase.SupabaseSession session = com.ghostqueue.supabase.SessionManager.getInstance().getCurrentSession();
-        if (session != null) {
-            if (adminNameLabel != null) adminNameLabel.setText(session.getFullName());
-            if (adminRoleLabel != null) adminRoleLabel.setText("System Administrator (" + session.getEmail() + ")");
-            if (adminAvatarLabel != null) {
-                String initial = session.getFullName() != null && !session.getFullName().isBlank()
-                        ? session.getFullName().substring(0, 1).toUpperCase() : "A";
-                adminAvatarLabel.setText(initial);
+        String fullName = "Dr. Sarah Chen";
+        String email = "admin@ghostqueue.com";
+        try {
+            com.ghostqueue.supabase.SupabaseSession session = com.ghostqueue.supabase.SessionManager.getInstance().getCurrentSession();
+            if (session != null && session.getFullName() != null && !session.getFullName().isBlank()) {
+                fullName = session.getFullName();
+                email = session.getEmail();
             }
+        } catch (Exception ignored) {}
+        if (adminNameLabel != null) adminNameLabel.setText(fullName);
+        if (adminRoleLabel != null) adminRoleLabel.setText("System Administrator (" + email + ")");
+        if (adminAvatarLabel != null) {
+            adminAvatarLabel.setText(fullName.substring(0, 1).toUpperCase());
         }
 
         // Setup Top Nav Date

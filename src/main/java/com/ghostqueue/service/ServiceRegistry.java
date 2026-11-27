@@ -1,9 +1,8 @@
 package com.ghostqueue.service;
 
+import com.ghostqueue.mongodb.repository.*;
 import com.ghostqueue.prediction.PredictionRepository;
-import com.ghostqueue.prediction.SupabasePredictionRepository;
 import com.ghostqueue.repository.*;
-import com.ghostqueue.repository.supabase.*;
 
 import java.util.logging.Logger;
 
@@ -32,16 +31,16 @@ public class ServiceRegistry {
     private final NotificationService notificationService;
 
     private ServiceRegistry() {
-        LOGGER.info("Initializing GhostQueue ServiceRegistry with Supabase PostgreSQL & Auth...");
+        LOGGER.info("Initializing GhostQueue ServiceRegistry with MongoDB Atlas (Cluster0)...");
 
-        this.patientRepository = new SupabasePatientRepository();
-        this.doctorRepository = new SupabaseDoctorRepository();
-        this.historyRepository = new SupabaseAppointmentHistoryRepository();
-        this.appointmentRepository = new SupabaseAppointmentRepository();
-        this.queueRepository = new SupabaseQueueRepository();
-        this.predictionRepository = new SupabasePredictionRepository();
-        this.reallocationHistoryRepository = new SupabaseReallocationHistoryRepository();
-        this.reminderRepository = new SupabaseReminderRepository();
+        this.patientRepository = new MongoPatientRepository();
+        this.doctorRepository = new MongoDoctorRepository();
+        this.historyRepository = new MongoAppointmentHistoryRepository();
+        this.appointmentRepository = new MongoAppointmentRepository();
+        this.queueRepository = new MongoQueueRepository();
+        this.predictionRepository = new MongoPredictionRepository();
+        this.reallocationHistoryRepository = new MongoReallocationHistoryRepository();
+        this.reminderRepository = new MongoReminderRepository();
 
         this.patientService = new PatientService(patientRepository);
         this.doctorService = new DoctorService(doctorRepository);
@@ -71,7 +70,7 @@ public class ServiceRegistry {
         this.predictionService.getRiskClassifier().setHighThreshold(highRisk);
         this.predictionService.getRiskClassifier().setLowThreshold(medRisk);
 
-        LOGGER.info("GhostQueue ServiceRegistry initialized successfully with primary Supabase backend.");
+        LOGGER.info("GhostQueue ServiceRegistry initialized successfully with primary MongoDB Atlas backend.");
     }
 
     public static synchronized ServiceRegistry getInstance() {

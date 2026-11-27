@@ -51,12 +51,12 @@ public class SupabaseDoctorRepository implements DoctorRepository {
 
     private static List<Doctor> getFallbackDoctors() {
         return List.of(
-            new Doctor("DOC-101", "Dr. Alexander Vance", "CARDIOLOGY", "Interventional Cardiology", "+1 (555) 234-5678", true),
-            new Doctor("DOC-102", "Dr. Evelyn Wright", "CARDIOLOGY", "Pediatric Cardiology", "+1 (555) 345-6789", true),
-            new Doctor("DOC-103", "Dr. Marcus Thorne", "ORTHOPEDICS", "Joint Reconstruction", "+1 (555) 456-7890", true),
-            new Doctor("DOC-104", "Dr. Priya Patel", "NEUROLOGY", "Neurodegenerative Diseases", "+1 (555) 567-8901", true),
-            new Doctor("DOC-105", "Dr. Sarah Chen", "PEDIATRICS", "General Pediatrics & Neonatology", "+1 (555) 678-9012", true),
-            new Doctor("DOC-106", "Dr. Tariq Al-Mansoor", "GENERAL_MEDICINE", "Internal & Preventative Medicine", "+1 (555) 789-0123", true)
+            new Doctor("DOC-101", "Dr. Alexander Vance", "CARDIOLOGY", "Interventional Cardiology", "+1 (555) 234-5678", "AVAILABLE"),
+            new Doctor("DOC-102", "Dr. Evelyn Wright", "CARDIOLOGY", "Pediatric Cardiology", "+1 (555) 345-6789", "AVAILABLE"),
+            new Doctor("DOC-103", "Dr. Marcus Thorne", "ORTHOPEDICS", "Joint Reconstruction", "+1 (555) 456-7890", "AVAILABLE"),
+            new Doctor("DOC-104", "Dr. Priya Patel", "NEUROLOGY", "Neurodegenerative Diseases", "+1 (555) 567-8901", "AVAILABLE"),
+            new Doctor("DOC-105", "Dr. Sarah Chen", "PEDIATRICS", "General Pediatrics & Neonatology", "+1 (555) 678-9012", "AVAILABLE"),
+            new Doctor("DOC-106", "Dr. Tariq Al-Mansoor", "GENERAL_MEDICINE", "Internal & Preventative Medicine", "+1 (555) 789-0123", "AVAILABLE")
         );
     }
 

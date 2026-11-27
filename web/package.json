@@ -1,0 +1,13 @@
+{
+  "name": "ghostqueue-web",
+  "version": "1.0.0",
+  "description": "GhostQueue Healthcare Intelligence & Predictive Reallocation Web Portal",
+  "main": "app.js",
+  "scripts": {
+    "start": "npx serve . -p 3000",
+    "dev": "npx serve . -p 3000"
+  },
+  "keywords": ["healthcare", "prediction", "no-show", "java", "hospital", "reallocation"],
+  "author": "SATHWICK & DeepMind",
+  "license": "MIT"
+}

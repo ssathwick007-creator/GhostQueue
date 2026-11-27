@@ -40,7 +40,7 @@ public class RegisterController {
     @FXML
     public void initialize() {
         if (brandLogoContainer != null) {
-            brandLogoContainer.getChildren().setAll(IconHelper.createIcon("overview", "#168C83", 1.4));
+            brandLogoContainer.getChildren().setAll(IconHelper.createBrandLogo(1.15));
         }
         if (featCalendarIcon != null) {
             featCalendarIcon.getChildren().setAll(IconHelper.createIcon("appointments", "#21A69A", 0.9));

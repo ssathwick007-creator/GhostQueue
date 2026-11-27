@@ -27,6 +27,10 @@ public class SupabaseAuthService {
         return instance;
     }
 
+    public SupabaseSession getCurrentSession() {
+        return SessionManager.getInstance().getCurrentSession();
+    }
+
     public SupabaseSession signIn(String email, String password, boolean rememberMe) {
         if (email == null || email.isBlank() || password == null || password.isBlank()) {
             throw new IllegalArgumentException("Email and password are required.");

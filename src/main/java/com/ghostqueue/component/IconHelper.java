@@ -37,8 +37,44 @@ public final class IconHelper {
         return container;
     }
 
+    /**
+     * Creates the official GhostQueue Brand Logo emblem:
+     * A vibrant clinical cyan-to-emerald gradient squircle with a crisp medical cross
+     * and dynamic intelligence pulse wave.
+     */
+    public static Node createBrandLogo(double scale) {
+        double boxSize = 38 * scale;
+        StackPane box = new StackPane();
+        box.setPrefSize(boxSize, boxSize);
+        box.setMinSize(boxSize, boxSize);
+        box.setMaxSize(boxSize, boxSize);
+        box.setStyle("-fx-background-color: linear-gradient(to bottom right, #0ea5e9, #10b981); " +
+                     "-fx-background-radius: " + Math.round(9 * scale) + "px; " +
+                     "-fx-effect: dropshadow(gaussian, rgba(14, 165, 233, 0.45), " + Math.round(8 * scale) + ", 0, 0, 2);");
+
+        SVGPath cross = new SVGPath();
+        cross.setContent("M10.5 4a1.5 1.5 0 0 1 3 0v4.5H18a1.5 1.5 0 0 1 0 3h-4.5V16a1.5 1.5 0 0 1-3 0v-4.5H6a1.5 1.5 0 0 1 0-3h4.5V4z");
+        cross.setFill(Color.WHITE);
+        cross.setScaleX(scale * 1.05);
+        cross.setScaleY(scale * 1.05);
+
+        SVGPath pulse = new SVGPath();
+        pulse.setContent("M3 12h4.5l1.5-3.5 2.5 7 1.8-5.5 1.5 2.5h5.7");
+        pulse.setStroke(Color.web("#064e3b"));
+        pulse.setStrokeWidth(1.8 * scale);
+        pulse.setFill(Color.TRANSPARENT);
+        pulse.setScaleX(scale);
+        pulse.setScaleY(scale);
+
+        box.getChildren().addAll(cross, pulse);
+        return box;
+    }
+
     public static String getPath(String name) {
         return switch (name.toLowerCase()) {
+            case "brand", "logo", "ghostqueue" ->
+                "M10.5 4a1.5 1.5 0 0 1 3 0v4.5H18a1.5 1.5 0 0 1 0 3h-4.5V16a1.5 1.5 0 0 1-3 0v-4.5H6a1.5 1.5 0 0 1 0-3h4.5V4z";
+
             case "overview", "dashboard" ->
                 "M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z";
 

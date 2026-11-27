@@ -124,6 +124,14 @@
                 <configuration>
                     <mainClass>com.ghostqueue.Launcher</mainClass>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>web</id>
+                        <configuration>
+                            <mainClass>com.ghostqueue.web.GhostQueueWebServer</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

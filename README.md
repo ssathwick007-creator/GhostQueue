@@ -2,11 +2,11 @@
 
 [![Java Version](https://img.shields.io/badge/Java-21%20LTS-007396?style=flat&logo=openjdk&logoColor=white)](https://openjdk.org/projects/jdk/21/)
 [![JavaFX](https://img.shields.io/badge/JavaFX-21.0.2-FF8800?style=flat&logo=javafx&logoColor=white)](https://openjfx.io/)
-[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1?style=flat&logo=mysql&logoColor=white)](https://www.mysql.com/)
+[![MongoDB Atlas](https://img.shields.io/badge/MongoDB%20Atlas-Cloud%20Database-47A248?style=flat&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
 [![Build Tool](https://img.shields.io/badge/Maven-3.9%2B-C71A36?style=flat&logo=apachemaven&logoColor=white)](https://maven.apache.org/)
 [![License](https://img.shields.io/badge/License-Academic%20Capstone-168C83?style=flat)](#license)
 
-> **GhostQueue** is an enterprise-grade hospital appointment management and clinical intelligence platform. It combines pure Java predictive machine learning with human-in-the-loop dynamic slot backfilling to identify potential appointment no-shows, maintain an intelligent waiting queue, recommend high-compatibility slot reallocations, and reclaim wasted physician capacity.
+> **GhostQueue** is an enterprise-grade hospital appointment management and clinical intelligence platform. It combines pure Java predictive machine learning with human-in-the-loop dynamic slot backfilling to identify potential appointment no-shows, maintain an intelligent waiting queue, recommend high-compatibility slot reallocations, and reclaim wasted physician capacity. Powered by **MongoDB Atlas Cloud Database** and featuring both a modern **Single-Page Cloud Web Application** and a **Desktop JavaFX Client**.
 
 ---
 
@@ -44,47 +44,49 @@ GhostQueue transforms clinical scheduling from a passive calendar into an **auto
 
 ## 3. Technology Stack & Architectural Patterns
 
-- **Core Runtime:** Java 21 (LTS) — utilizing Records, Pattern Matching for `switch`, Sealed Types, and Modular Architecture (`module-info.java`).
-- **User Interface:** JavaFX 21 (FXML + CSS) styled with custom healthcare design tokens (`#172A3A` slate sidebar, `#168C83` clinical teal, `#F5F6F4` neutral canvas, `#FFFFFF` cards).
-- **Database Layer:** MySQL 8.0+ via JDBC with robust connection abstraction (`DatabaseConnection.java`), foreign key constraints, indexes, and automated schema migration (`DatabaseInitializer.java`).
+- **Core Runtime:** Java 21 (LTS) — utilizing Records, Pattern Matching for `switch`, Sealed Types, Virtual Threads, and Modular Architecture (`module-info.java`).
+- **Primary Cloud Database:** **MongoDB Atlas Cloud Cluster** (`cluster0.d5szoha.mongodb.net`, database `ghostqueue_db`) with official MongoDB Java Driver 5.3.1, automated schema auto-seeding, and connection fallback.
+- **Web Interface:** Modern Single-Page Cloud Web Application (SPA) powered by pure HTML5, CSS3, modern Vanilla ES6+, and responsive data visualizations.
+- **Desktop Interface:** JavaFX 21 (FXML + CSS) styled with custom healthcare design tokens (`#172A3A` slate sidebar, `#168C83` clinical teal, luminous cyan accents, `#F5F6F4` neutral canvas, `#FFFFFF` cards).
+- **Embedded Web Server:** High-performance, zero-external-framework HTTP REST server (`GhostQueueWebServer`) running on Java 21's Virtual Threads per-task executor (`jdk.httpserver`).
 - **Predictive Analytics:** Custom Pure Java Logistic Regression model trained via Stochastic Gradient Descent (SGD) with Mini-Batch updates, L2 Regularization, Sigmoid Activation, and ROC-AUC evaluation. Zero Python, R, or external machine learning runtime required.
 - **Architecture:** Layered Enterprise Architecture:
+  - **Web & API Layer (`com.ghostqueue.web`):** Full REST API endpoints and embedded web asset server.
   - **Controller Layer (`com.ghostqueue.controller`):** JavaFX GUI events, input validation, and asynchronous UI updates.
   - **Service Layer (`com.ghostqueue.service`):** Business logic, triage calculations, transaction boundaries, and orchestrations.
-  - **Repository Layer (`com.ghostqueue.repository`):** JDBC abstractions and SQL persistence with pure interface segregation.
+  - **MongoDB Repository Layer (`com.ghostqueue.mongodb.repository`):** MongoDB Atlas cloud document persistence, indexing, and high-performance bulk operations.
   - **Domain Model Layer (`com.ghostqueue.model`):** Encapsulated entities, records, and enums.
   - **Prediction Layer (`com.ghostqueue.prediction`):** Mathematical feature vectors, weights, gradients, evaluators, and dataset generators.
   - **Scheduling Layer (`com.ghostqueue.scheduling`):** Multi-factor clinical compatibility scoring algorithms.
 
 ---
 
-## 4. Relational Database Architecture
+## 4. Cloud Database Architecture (MongoDB Atlas)
 
-The application connects to a MySQL database named `ghostqueue_db` with 9 relational tables:
+The primary cloud database runs on **MongoDB Atlas** with 8 persistent collections in the `ghostqueue_db` database:
 
 ```mermaid
 erDiagram
     PATIENTS ||--o{ APPOINTMENTS : "books"
     PATIENTS ||--o{ WAITING_QUEUE : "enrolled in"
-    PATIENTS ||--o{ APPOINTMENT_REMINDERS : "receives"
+    PATIENTS ||--o{ REMINDERS : "receives"
     DOCTORS ||--o{ APPOINTMENTS : "attends"
     DOCTORS ||--o{ WAITING_QUEUE : "requested for"
     APPOINTMENTS ||--o{ APPOINTMENT_HISTORY : "tracks status"
-    APPOINTMENTS ||--o| APPOINTMENT_PREDICTIONS : "evaluated by"
+    APPOINTMENTS ||--o| PREDICTIONS : "evaluated by"
     APPOINTMENTS ||--o{ REALLOCATION_HISTORY : "backfilled via"
     WAITING_QUEUE ||--o{ REALLOCATION_HISTORY : "candidate for"
 ```
 
-### Table Breakdown:
-1. `patients`: Master demographic records (`patient_id`, `full_name`, `age`, `gender`, `phone`, `email`, `address`, `created_at`).
-2. `doctors`: Medical staff directory (`doctor_id`, `full_name`, `department`, `specialization`, `phone`, `availability_status`).
-3. `appointments`: Central scheduling table (`appointment_id`, `patient_id`, `doctor_id`, `appointment_date`, `appointment_time`, `appointment_status`, `booking_date`, `cancellation_reason`, `created_at`, `updated_at`).
-4. `appointment_history`: Immutable status transition audit log (`history_id`, `appointment_id`, `previous_status`, `new_status`, `changed_at`, `remarks`).
-5. `waiting_queue`: Standby patient registry (`queue_id`, `patient_id`, `doctor_id`, `requested_date`, `preferred_time`, `priority_level`, `queue_status`, `notes`, `created_at`, `updated_at`).
-6. `appointment_predictions`: ML inference results (`prediction_id`, `appointment_id`, `model_version`, `no_show_probability`, `risk_level`, `prediction_method`, `contributing_factors`, `suggested_action`, `predicted_at`).
-7. `reallocation_history`: Slot backfill transaction ledger (`reallocation_id`, `appointment_id`, `queue_id`, `candidate_patient_id`, `doctor_id`, `slot_date`, `slot_time`, `match_score`, `match_reason`, `decision`, `decision_notes`, `created_at`, `decided_at`).
-8. `appointment_reminders`: High-risk outreach dispatch ledger (`reminder_id`, `appointment_id`, `patient_id`, `reminder_type`, `reminder_status`, `scheduled_for`, `completed_at`, `message_content`, `response_status`, `operator_notes`).
-9. `system_settings`: Persisted operational configuration (`setting_key`, `setting_value`, `setting_category`, `description`, `updated_at`).
+### Collection Breakdown:
+1. `patients`: Master demographic records (`patientId`, `fullName`, `age`, `gender`, `phone`, `email`, `address`, `createdAt`).
+2. `doctors`: Medical staff directory (`doctorId`, `fullName`, `department`, `specialization`, `phone`, `availabilityStatus`).
+3. `appointments`: Central scheduling collection (`appointmentId`, `patientId`, `doctorId`, `appointmentDate`, `appointmentTime`, `status`, `bookingDate`, `cancellationReason`, `createdAt`, `updatedAt`).
+4. `appointment_history`: Immutable status transition audit log (`historyId`, `appointmentId`, `previousStatus`, `newStatus`, `changedAt`, `remarks`).
+5. `waiting_queue`: Standby patient registry (`queueId`, `patientId`, `doctorId`, `requestedDate`, `preferredTime`, `priorityLevel`, `status`, `registeredTime`, `notes`).
+6. `predictions`: ML inference results (`predictionId`, `appointmentId`, `modelVersion`, `noShowProbability`, `riskLevel`, `predictionMethod`, `contributingFactors`, `suggestedAction`, `predictedAt`).
+7. `reallocation_history`: Slot backfill transaction ledger (`reallocationId`, `appointmentId`, `queueId`, `candidatePatientId`, `doctorId`, `slotDate`, `slotTime`, `matchScore`, `matchReason`, `decision`, `decisionNotes`, `createdAt`, `decidedAt`).
+8. `reminders`: High-risk outreach dispatch ledger (`reminderId`, `appointmentId`, `patientId`, `reminderType`, `reminderStatus`, `scheduledFor`, `completedAt`, `messageContent`, `responseStatus`, `operatorNotes`).
 
 ---
 
@@ -156,23 +158,22 @@ The candidates are ranked descending by score. When the clinical coordinator cli
    ```powershell
    mvn --version
    ```
-3. **MySQL Server 8.0+**
-   - Ensure MySQL is running on `localhost:3306`.
-   - Create the database and user (or run under `root`):
-     ```sql
-     CREATE DATABASE IF NOT EXISTS ghostqueue_db;
+3. **MongoDB Atlas Cloud Database (Configured & Live)**
+   - Connected directly to the dedicated MongoDB Atlas cloud cluster:
      ```
+     cluster0.d5szoha.mongodb.net
+     ```
+   - Database name: `ghostqueue_db`
 
-### Database Configuration
-Database connection parameters can be provided via `src/main/resources/database.properties` or environment variables:
+### Database Configuration & Credentials
+The MongoDB Atlas connection is managed in `MongoConnection.java` or via environment variables:
 
 ```properties
-db.url=jdbc:mysql://localhost:3306/ghostqueue_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&characterEncoding=UTF-8
-db.user=root
-db.password=
+# MongoDB Atlas Connection URI
+MONGODB_URI=mongodb+srv://192525127simats_db_user:5dztdeq1lYHcqMrR@cluster0.d5szoha.mongodb.net/ghostqueue_db?retryWrites=true&w=majority
 ```
 
-*Note:* GhostQueue features an automated self-healing database bootstrap (`DatabaseInitializer.java`). On initial launch, if tables do not exist, it automatically executes `/db/init.sql`, creates all 9 relational tables, and seeds realistic patients, doctors, appointments, queue standby records, and initial system settings.
+*Note:* GhostQueue features automated collection seeding (`MongoConnection.seedDatabaseIfEmpty()`). On initial launch, if collections do not exist or are empty, it automatically populates realistic patients, doctors, appointments, queue standby records, and ML prediction scores directly to your Atlas cluster. MySQL connection fallback is also retained for hybrid legacy setups.
 
 ---
 
@@ -196,14 +197,65 @@ mvn test
 mvn clean package -DskipTests
 ```
 
-### 4. Launch the JavaFX Application
+### 4. Launch Options
+
+#### Option A: Cloud Web Application (Modern Browser UI & Embedded REST API)
+You can run GhostQueue as a full-stack Web Application accessible from any browser:
+
+**Windows 1-Click Launchers:**
+- Double click `run-web.bat` or run in PowerShell:
+```powershell
+.\run-web.bat
+# or
+.\run-web.ps1
+```
+
+**Maven Direct Command:**
+```powershell
+mvn compile exec:java@web
+```
+
+Once started, open your browser at:
+- **Web Application Portal:** [`http://localhost:8080/`](http://localhost:8080/)
+- **REST API Health Check:** [`http://localhost:8080/api/health`](http://localhost:8080/api/health)
+- **Live Clinical KPIs:** [`http://localhost:8080/api/analytics/kpis`](http://localhost:8080/api/analytics/kpis)
+
+#### Option B: Desktop Workstation Application (JavaFX 21 GUI)
 ```powershell
 mvn javafx:run
 ```
 
 ---
 
-## 9. Application User Interface Walkthrough
+## 9. Cloud Web Application & REST API Architecture
+
+GhostQueue features an embedded HTTP server (`GhostQueueWebServer`) running on Java 21's `jdk.httpserver` with a **Virtual Thread Per-Task Executor** (`Executors.newVirtualThreadPerTaskExecutor()`). It delivers sub-millisecond API latency with zero external framework overhead.
+
+### Complete REST API Directory
+
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/health` | Comprehensive multi-cloud health status (Supabase, MongoDB, Model version, Active threads). |
+| `POST` | `/api/auth/login` | Cloud authentication with role switching (Admin, Doctor, Patient). |
+| `GET` | `/api/auth/session` | Inspect active session token and user profile. |
+| `GET` | `/api/appointments` | Fetch full appointment schedule with real-time risk scores. |
+| `POST` | `/api/appointments` | Book new appointment with automated risk calculation. |
+| `GET` | `/api/patients` | Patient directory roster. |
+| `GET` | `/api/doctors` | Physician directory with department and availability. |
+| `GET` | `/api/queue` | Standby waiting queue sorted by priority score (0–100). |
+| `POST` | `/api/predict` | Interactive no-show probability calculation with XAI factors. |
+| `POST` | `/api/predict/retrain` | Retrain Logistic Regression model on cohort data & return confusion matrix. |
+| `GET` | `/api/reallocate` | Active slot reallocation recommendations and vacant slots. |
+| `POST` | `/api/reallocate/approve` | Approve smart backfill candidate and assign appointment slot. |
+| `GET` | `/api/analytics/kpis` | Real-time operations metrics (attendance rate, slots reclaimed, ROI). |
+| `GET` | `/api/analytics/charts` | Chart data (attendance trends, department utilization, risk distribution). |
+| `GET` | `/api/analytics/export-csv` | Stream live clinical operations report as downloadable CSV. |
+| `GET` | `/api/settings` | Multi-cloud database parameters and ML threshold configurations. |
+| `GET` | `/` | Responsive Single-Page Web Application (`index.html`). |
+
+---
+
+## 10. Application User Interface Walkthrough
 
 1. **Operations Overview (`/fxml/dashboard.fxml`):**
    - Live KPI cards: Total Appointments Today, Confirmed Patients, Predicted At-Risk Visits, Active Waiting Standbys, Overall Attendance Rate (88.4%), and Slot Recovery Efficiency (74.2%).

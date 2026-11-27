@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostQueue | Healthcare Intelligence & Predictive Reallocation</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏥</text></svg>">
+</head>
+<body>
+
+  <!-- SITE HEADER (Semantic & Accessible) -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a class="brand-container" href="#dashboard" aria-label="GhostQueue Home">
+        <div class="brand-logo" aria-hidden="true">
+          <svg class="brand-logo-svg" viewBox="0 0 40 40" width="38" height="38" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="gq-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0ea5e9" />
+                <stop offset="100%" stop-color="#10b981" />
+              </linearGradient>
+              <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0ea5e9" flood-opacity="0.45"/>
+              </filter>
+            </defs>
+            <rect width="40" height="40" rx="10" fill="url(#gq-grad)" filter="url(#glow)"/>
+            <path d="M17 9a2 2 0 0 1 4 0v7h7a2 2 0 0 1 0 4h-7v7a2 2 0 0 1-4 0v-7H9a2 2 0 0 1 0-4h8V9z" fill="#ffffff" fill-opacity="0.95"/>
+            <path d="M6 20h6l2.2-4.5 3.6 9 2.7-7 2 3.5H34" stroke="#042f2e" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <h1>GhostQueue</h1>
+          <span class="brand-badge">Healthcare Intelligence</span>
+        </div>
+      </a>
+
+      <!-- Primary Navigation Bar -->
+      <nav class="site-nav" aria-label="Primary">
+        <ul class="nav-list">
+          <li><a class="nav-link" href="#dashboard" data-view="dashboard" aria-current="page">Dashboard</a></li>
+          <li><a class="nav-link" href="#predict" data-view="predict">AI Risk Engine</a></li>
+          <li><a class="nav-link" href="#reallocate" data-view="reallocate">Reallocation</a></li>
+          <li><a class="nav-link" href="#appointments" data-view="appointments">Appointments</a></li>
+          <li><a class="nav-link" href="#queue" data-view="queue">Waiting Queue</a></li>
+          <li><a class="nav-link" href="#doctors" data-view="doctors">Physicians</a></li>
+          <li><a class="nav-link" href="#analytics" data-view="analytics">Reports</a></li>
+          <li><a class="nav-link" href="#settings" data-view="settings">Settings</a></li>
+        </ul>
+      </nav>
+
+      <!-- Role Switcher & Live Database Status -->
+      <div class="header-actions">
+        <div class="role-switcher" role="radiogroup" aria-label="Simulate Clinical Role">
+          <button type="button" class="role-btn active" data-role="ADMIN" role="radio" aria-checked="true" title="Switch to Hospital Administrator">Admin</button>
+          <button type="button" class="role-btn" data-role="DOCTOR" role="radio" aria-checked="false" title="Switch to Attending Physician">Doctor</button>
+          <button type="button" class="role-btn" data-role="PATIENT" role="radio" aria-checked="false" title="Switch to Patient Portal">Patient</button>
+        </div>
+
+        <div class="status-badge" title="Live MongoDB Atlas Cloud Connected">
+          <span class="status-dot" aria-hidden="true"></span>
+          <span>MongoDB Atlas Connected</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN APPLICATION CONTENT -->
+  <main class="main-content">
+
+    <!-- =========================================================================
+         1. EXECUTIVE DASHBOARD VIEW
+         ========================================================================= -->
+    <section id="view-dashboard" class="view-section active" aria-labelledby="heading-dashboard">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-dashboard">Hospital Operational Overview</h2>
+          <p id="dashboard-subtitle">Real-time clinical throughput, attendance fidelity, and dynamic slot recovery metrics.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-dashboard">🔄 Refresh Metrics</button>
+          <button class="btn btn-primary btn-sm" id="btn-open-book-modal">+ Book Appointment</button>
+        </div>
+      </div>
+
+      <!-- Live KPI Stat Cards -->
+      <div class="kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Total Appointments</span>
+            <span aria-hidden="true">📅</span>
+          </div>
+          <div class="kpi-value" id="kpi-total-appts">24</div>
+          <div class="kpi-subtitle" id="kpi-today-count">6 scheduled for today</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Attendance Rate</span>
+            <span aria-hidden="true">📈</span>
+          </div>
+          <div class="kpi-value" id="kpi-attendance-rate">85.7%</div>
+          <div class="kpi-subtitle positive">↑ 3.2% vs baseline</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Predicted No-Show Rate</span>
+            <span aria-hidden="true">⚠️</span>
+          </div>
+          <div class="kpi-value" id="kpi-noshow-rate">14.3%</div>
+          <div class="kpi-subtitle negative">↓ 6.1% reduced via triage</div>
+        </div>
+
+        <div class="kpi-card">
+          <div class="kpi-header">
+            <span>Slot Recovery Efficiency</span>
+            <span aria-hidden="true">⚡</span>
+          </div>
+          <div class="kpi-value" id="kpi-recovery-rate">80.0%</div>
+          <div class="kpi-subtitle positive" id="kpi-active-queue">4 standby candidates ready</div>
+        </div>
+      </div>
+
+      <!-- Dashboard Grid: Charts and Activity -->
+      <div class="dashboard-grid">
+        <!-- SVG Clinical Attendance Trend Chart -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Monthly Attendance vs No-Show Trends</h3>
+            <span class="badge badge-low">Logistic Regression Calibrated</span>
+          </div>
+          <div style="height: 220px; display: flex; align-items: center; justify-content: center;">
+            <svg viewBox="0 0 500 180" style="width: 100%; height: 100%;" aria-label="Attendance Trend Line Chart">
+              <!-- Grid lines -->
+              <line x1="40" y1="20" x2="480" y2="20" stroke="#22354e" stroke-dasharray="3,3" />
+              <line x1="40" y1="60" x2="480" y2="60" stroke="#22354e" stroke-dasharray="3,3" />
+              <line x1="40" y1="100" x2="480" y2="100" stroke="#22354e" stroke-dasharray="3,3" />
+              <line x1="40" y1="140" x2="480" y2="140" stroke="#22354e" />
+
+              <!-- Attended Line (Teal) -->
+              <polyline fill="none" stroke="#14b8a6" stroke-width="3" points="80,110 180,95 280,60 380,45 460,35" />
+              <!-- No Show Line (Red) -->
+              <polyline fill="none" stroke="#f87171" stroke-width="2.5" stroke-dasharray="4,4" points="80,130 180,135 280,140 380,145 460,150" />
+
+              <!-- Points Attended -->
+              <circle cx="80" cy="110" r="4" fill="#14b8a6" />
+              <circle cx="180" cy="95" r="4" fill="#14b8a6" />
+              <circle cx="280" cy="60" r="4" fill="#14b8a6" />
+              <circle cx="380" cy="45" r="4" fill="#14b8a6" />
+              <circle cx="460" cy="35" r="4" fill="#14b8a6" />
+
+              <!-- Month Labels -->
+              <text x="80" y="165" fill="#94a3b8" font-size="11" text-anchor="middle">Aug</text>
+              <text x="180" y="165" fill="#94a3b8" font-size="11" text-anchor="middle">Sep</text>
+              <text x="280" y="165" fill="#94a3b8" font-size="11" text-anchor="middle">Oct</text>
+              <text x="380" y="165" fill="#94a3b8" font-size="11" text-anchor="middle">Nov</text>
+              <text x="460" y="165" fill="#94a3b8" font-size="11" text-anchor="middle">Today</text>
+            </svg>
+          </div>
+          <div style="display: flex; gap: 1.5rem; justify-content: center; margin-top: 0.5rem; font-size: 0.775rem;">
+            <span style="color: #14b8a6; display: flex; align-items: center; gap: 0.4rem;">
+              <span style="width: 12px; height: 3px; background: #14b8a6; display: inline-block;"></span> Completed Consultations
+            </span>
+            <span style="color: #f87171; display: flex; align-items: center; gap: 0.4rem;">
+              <span style="width: 12px; height: 2px; background: #f87171; display: inline-block; border-top: 2px dashed #f87171;"></span> Unattended No-Shows (Declining)
+            </span>
+          </div>
+        </div>
+
+        <!-- Risk Distribution Donut & Summary -->
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Active Risk Distribution</h3>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; justify-content: center; padding: 1rem 0;">
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <span style="color: #34d399; font-weight: 600;">Low Risk (&lt;30%)</span>
+                <span id="dist-low-count">14 appointments (60%)</span>
+              </div>
+              <div style="height: 8px; background: #0b131e; border-radius: 999px; overflow: hidden;">
+                <div style="width: 60%; height: 100%; background: #34d399;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <span style="color: #fbbf24; font-weight: 600;">Medium Risk (30-65%)</span>
+                <span id="dist-med-count">6 appointments (25%)</span>
+              </div>
+              <div style="height: 8px; background: #0b131e; border-radius: 999px; overflow: hidden;">
+                <div style="width: 25%; height: 100%; background: #fbbf24;"></div>
+              </div>
+            </div>
+
+            <div>
+              <div style="display: flex; justify-content: space-between; font-size: 0.8rem; margin-bottom: 0.25rem;">
+                <span style="color: #f87171; font-weight: 600;">High Risk (≥65%)</span>
+                <span id="dist-high-count">4 appointments (15%)</span>
+              </div>
+              <div style="height: 8px; background: #0b131e; border-radius: 999px; overflow: hidden;">
+                <div style="width: 15%; height: 100%; background: #f87171;"></div>
+              </div>
+            </div>
+
+            <p style="font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; text-align: center;">
+              Auto-standby triage triggers proactively for appointments classified as High Risk.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Appointments Table (Accessible & Responsive) -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Today's Active Appointments Schedule</h3>
+          <a href="#appointments" class="btn btn-secondary btn-sm" onclick="switchView('appointments')">View All (24) →</a>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="caption-today-appts" class="table-wrapper">
+          <table class="data-table">
+            <caption id="caption-today-appts">List of scheduled hospital appointments for today</caption>
+            <thead>
+              <tr>
+                <th scope="col">Time</th>
+                <th scope="col">Patient Name</th>
+                <th scope="col">Department</th>
+                <th scope="col">Attending Physician</th>
+                <th scope="col">Status</th>
+                <th scope="col">Risk Level</th>
+                <th scope="col">No-Show %</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="table-dashboard-appts">
+              <!-- Populated dynamically via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         2. PREDICTIVE AI & XAI ENGINE VIEW
+         ========================================================================= -->
+    <section id="view-predict" class="view-section" aria-labelledby="heading-predict">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-predict">Predictive No-Show AI & Explainability (XAI)</h2>
+          <p>Supervised Logistic Regression inference engine (83.3% Accuracy, ROC-AUC 0.7867) with feature-level factor attribution.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-retrain-model">🧠 Retrain ML Model</button>
+        </div>
+      </div>
+
+      <!-- Interactive Real-Time Risk Calculator -->
+      <div class="calculator-grid" style="margin-bottom: 1.5rem;">
+        <div class="calculator-card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 1rem; color: #fff;">Interactive Risk Scorer</h3>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+            <div class="form-group">
+              <label for="calc-lead-days">Lead Days: <span id="lbl-lead-days" style="color: var(--teal-primary);">14</span></label>
+              <input type="range" id="calc-lead-days" min="1" max="60" value="14" class="input-field" style="padding: 0.2rem 0;">
+            </div>
+
+            <div class="form-group">
+              <label for="calc-prior-noshows">Prior No-Shows: <span id="lbl-prior-noshows" style="color: var(--teal-primary);">1</span></label>
+              <input type="range" id="calc-prior-noshows" min="0" max="6" value="1" class="input-field" style="padding: 0.2rem 0;">
+            </div>
+
+            <div class="form-group">
+              <label for="calc-age">Patient Age: <span id="lbl-age" style="color: var(--teal-primary);">58</span></label>
+              <input type="range" id="calc-age" min="1" max="95" value="58" class="input-field" style="padding: 0.2rem 0;">
+            </div>
+
+            <div class="form-group">
+              <label for="calc-reminders">Reminders Sent: <span id="lbl-reminders" style="color: var(--teal-primary);">1</span></label>
+              <input type="range" id="calc-reminders" min="0" max="4" value="1" class="input-field" style="padding: 0.2rem 0;">
+            </div>
+
+            <div class="form-group">
+              <label for="calc-dept">Department</label>
+              <select id="calc-dept" class="select-field">
+                <option value="CARDIOLOGY">Cardiology</option>
+                <option value="NEUROLOGY">Neurology</option>
+                <option value="ORTHOPEDICS">Orthopedics</option>
+                <option value="ONCOLOGY">Oncology</option>
+                <option value="PEDIATRICS">Pediatrics</option>
+                <option value="GENERAL_MEDICINE">General Medicine</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="calc-timeslot">Time Window</label>
+              <select id="calc-timeslot" class="select-field">
+                <option value="MORNING">Morning (08:00 - 12:00)</option>
+                <option value="MIDDAY">Midday (12:00 - 14:00)</option>
+                <option value="AFTERNOON" selected>Afternoon (14:00 - 17:00)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculated Live Risk Meter & XAI Factors -->
+        <div class="calculator-card">
+          <h3 style="font-size: 1.1rem; font-weight: 700; margin-bottom: 0.75rem; color: #fff;">Inference Output</h3>
+          <div class="calc-meter-container">
+            <div class="meter-score" id="calc-result-prob">34.5%</div>
+            <div class="meter-level" id="calc-result-level" style="color: #fbbf24;">MEDIUM RISK</div>
+            <p id="calc-result-action" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 0.4rem;">
+              Dispatch SMS confirmation reminder 24 hours in advance.
+            </p>
+
+            <div class="factor-bars" id="calc-factor-bars">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scored Appointments Table -->
+      <div class="panel">
+        <div class="panel-header">
+          <h3 class="panel-title">Cohorts Scored by Logistic Regression (LOGISTIC_REGRESSION_V1.2)</h3>
+          <div style="display: flex; gap: 0.5rem;">
+            <select id="filter-predict-risk" class="select-field" style="padding: 0.25rem 0.6rem; font-size: 0.8rem;">
+              <option value="ALL">All Risk Levels</option>
+              <option value="HIGH">High Risk Only</option>
+              <option value="MEDIUM">Medium Risk Only</option>
+              <option value="LOW">Low Risk Only</option>
+            </select>
+          </div>
+        </div>
+
+        <div tabindex="0" role="region" aria-labelledby="caption-predictions" class="table-wrapper">
+          <table class="data-table">
+            <caption id="caption-predictions">Predictive risk assessment scores for all appointments</caption>
+            <thead>
+              <tr>
+                <th scope="col">Appt ID</th>
+                <th scope="col">Patient Name</th>
+                <th scope="col">Department</th>
+                <th scope="col">Risk Level</th>
+                <th scope="col">Probability</th>
+                <th scope="col">Primary Contributing Factors</th>
+                <th scope="col">Clinical Guidance</th>
+              </tr>
+            </thead>
+            <tbody id="table-predictions-body">
+              <!-- Populated via app.js -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         3. DYNAMIC REALLOCATION & WAITING QUEUE VIEW
+         ========================================================================= -->
+    <section id="view-reallocate" class="view-section" aria-labelledby="heading-reallocate">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-reallocate">Smart Slot Reallocation Pool</h2>
+          <p>Automated matchmaker pairing cancelled and high-risk slots with prioritized waiting standby patients.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-secondary btn-sm" id="btn-refresh-realloc">⚡ Re-run Matchmaker</button>
+        </div>
+      </div>
+
+      <div class="realloc-grid" id="reallocation-cards-container">
+        <!-- Rendered dynamically by app.js -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         4. APPOINTMENTS DIRECTORY VIEW
+         ========================================================================= -->
+    <section id="view-appointments" class="view-section" aria-labelledby="heading-appointments">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-appointments">Clinical Appointments Directory</h2>
+          <p>Manage, filter, and modify patient bookings across all clinical specialties.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary btn-sm" id="btn-book-from-list">+ New Booking</button>
+        </div>
+      </div>
+
+      <!-- Filters Toolbar -->
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1rem; align-items: center;">
+        <input type="text" id="filter-appt-search" placeholder="Search patient, doctor, or ID..." class="input-field" style="min-width: 260px;">
+        <select id="filter-appt-dept" class="select-field">
+          <option value="ALL">All Departments</option>
+          <option value="CARDIOLOGY">Cardiology</option>
+          <option value="NEUROLOGY">Neurology</option>
+          <option value="ORTHOPEDICS">Orthopedics</option>
+          <option value="ONCOLOGY">Oncology</option>
+          <option value="PEDIATRICS">Pediatrics</option>
+          <option value="GENERAL_MEDICINE">General Medicine</option>
+        </select>
+        <select id="filter-appt-status" class="select-field">
+          <option value="ALL">All Statuses</option>
+          <option value="CONFIRMED">Confirmed</option>
+          <option value="BOOKED">Booked</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+          <option value="NO_SHOW">No-Show</option>
+        </select>
+      </div>
+
+      <div tabindex="0" role="region" aria-labelledby="caption-all-appts" class="table-wrapper">
+        <table class="data-table">
+          <caption id="caption-all-appts">Directory of all clinical appointments</caption>
+          <thead>
+            <tr>
+              <th scope="col">ID</th>
+              <th scope="col">Date & Time</th>
+              <th scope="col">Patient</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Physician</th>
+              <th scope="col">Department</th>
+              <th scope="col">Status</th>
+              <th scope="col">Risk</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="table-appointments-body">
+            <!-- Populated dynamically via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         5. WAITING QUEUE VIEW
+         ========================================================================= -->
+    <section id="view-queue" class="view-section" aria-labelledby="heading-queue">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-queue">Standby Patient Waiting Pool</h2>
+          <p>Triage queue organized by clinical priority (Urgent, High, Standard) for slot backfilling.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary btn-sm" id="btn-add-queue-modal">+ Add to Waiting Queue</button>
+        </div>
+      </div>
+
+      <div tabindex="0" role="region" aria-labelledby="caption-queue-table" class="table-wrapper">
+        <table class="data-table">
+          <caption id="caption-queue-table">Patients in the standby waiting queue pool</caption>
+          <thead>
+            <tr>
+              <th scope="col">Queue ID</th>
+              <th scope="col">Patient Name</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Priority</th>
+              <th scope="col">Preferred Dept</th>
+              <th scope="col">Target Doctor</th>
+              <th scope="col">Time Preference</th>
+              <th scope="col">Status</th>
+              <th scope="col">Notes</th>
+            </tr>
+          </thead>
+          <tbody id="table-queue-body">
+            <!-- Populated dynamically via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         6. PHYSICIANS DIRECTORY VIEW
+         ========================================================================= -->
+    <section id="view-doctors" class="view-section" aria-labelledby="heading-doctors">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-doctors">Attending Physicians & Availability</h2>
+          <p>Manage clinical specialist rosters, operating departments, and on-duty availability status.</p>
+        </div>
+      </div>
+
+      <div tabindex="0" role="region" aria-labelledby="caption-doctors-table" class="table-wrapper">
+        <table class="data-table">
+          <caption id="caption-doctors-table">Attending medical specialists and active availability</caption>
+          <thead>
+            <tr>
+              <th scope="col">Doctor ID</th>
+              <th scope="col">Physician Name</th>
+              <th scope="col">Department</th>
+              <th scope="col">Specialization</th>
+              <th scope="col">Contact</th>
+              <th scope="col">Availability</th>
+              <th scope="col">Toggle Status</th>
+            </tr>
+          </thead>
+          <tbody id="table-doctors-body">
+            <!-- Populated dynamically via app.js -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         7. ANALYTICS & CSV AUDIT REPORT VIEW
+         ========================================================================= -->
+    <section id="view-analytics" class="view-section" aria-labelledby="heading-analytics">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-analytics">Clinical Analytics & Export</h2>
+          <p>Aggregate workload distribution, capacity utilization metrics, and downloadable audit logs.</p>
+        </div>
+        <div class="page-actions">
+          <a href="/api/analytics/export-csv" class="btn btn-primary btn-sm" download="ghostqueue_clinical_audit.csv">📥 Export Full CSV Report</a>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Physician Appointment Workload Distribution</h3>
+          </div>
+          <div id="analytics-workload-bars" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0.5rem 0;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Department Volume Share</h3>
+          </div>
+          <div id="analytics-department-bars" style="display: flex; flex-direction: column; gap: 0.75rem; padding: 0.5rem 0;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         8. SYSTEM CONFIGURATION & CLOUD STATUS
+         ========================================================================= -->
+    <section id="view-settings" class="view-section" aria-labelledby="heading-settings">
+      <div class="page-header">
+        <div class="page-title-group">
+          <h2 id="heading-settings">System Configuration & Multi-Cloud Backends</h2>
+          <p>Inspect database cluster connectivity, risk threshold boundaries, and hospital operating parameters.</p>
+        </div>
+        <div class="page-actions">
+          <button class="btn btn-primary btn-sm" id="btn-save-settings">💾 Save Configuration</button>
+        </div>
+      </div>
+
+      <div class="calculator-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Connected Cloud Infrastructure</h3>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div style="background: var(--bg-card); padding: 1.25rem; border-radius: var(--radius-sm); border: 1px solid var(--border);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-weight: 700; color: #fff; font-size: 1rem;">MongoDB Atlas Cloud Database</span>
+                <span class="badge badge-low">● Primary Database</span>
+              </div>
+              <p style="font-size: 0.8rem; color: var(--text-dim); margin-top: 0.4rem;">Cluster: <code>cluster0.d5szoha.mongodb.net</code> (Database: <code>ghostqueue_db</code>)</p>
+              <p style="font-size: 0.8rem; color: #34d399; margin-top: 0.25rem;">Active Collections: appointments, patients, doctors, waiting_queue, predictions, reallocation_history, reminders.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3 class="panel-title">Hospital Operating Parameters</h3>
+          </div>
+          <form id="form-settings" style="display: flex; flex-direction: column; gap: 0.75rem;">
+            <div class="form-group">
+              <label for="cfg-hospital-name">Hospital Name</label>
+              <input type="text" id="cfg-hospital-name" class="input-field" value="Metropolitan Academic Medical Center">
+            </div>
+            <div class="form-group">
+              <label for="cfg-campus">Campus Location</label>
+              <input type="text" id="cfg-campus" class="input-field" value="Main Medical Pavilion (North Tower)">
+            </div>
+            <div class="form-group">
+              <label for="cfg-high-thresh">High Risk Classification Threshold (Default: 0.65)</label>
+              <input type="number" step="0.05" min="0.5" max="0.9" id="cfg-high-thresh" class="input-field" value="0.65">
+            </div>
+            <div class="form-group">
+              <label for="cfg-med-thresh">Medium Risk Classification Threshold (Default: 0.30)</label>
+              <input type="number" step="0.05" min="0.1" max="0.5" id="cfg-med-thresh" class="input-field" value="0.30">
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =========================================================================
+         ACCESSIBLE DIALOG: BOOK APPOINTMENT MODAL
+         ========================================================================= -->
+  <dialog id="modal-book-appointment" class="modal-dialog">
+    <div class="modal-header">
+      <h3>Book Clinical Appointment</h3>
+      <button type="button" class="modal-close-btn" onclick="closeBookModal()" aria-label="Close dialog">&times;</button>
+    </div>
+
+    <form id="form-book-appointment">
+      <div class="form-group">
+        <label for="book-patient-select">Patient</label>
+        <select id="book-patient-select" class="select-field" required>
+          <!-- Options populated from patientService -->
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="book-dept-select">Department</label>
+        <select id="book-dept-select" class="select-field" required>
+          <option value="CARDIOLOGY">Cardiology</option>
+          <option value="NEUROLOGY">Neurology</option>
+          <option value="ORTHOPEDICS">Orthopedics</option>
+          <option value="ONCOLOGY">Oncology</option>
+          <option value="PEDIATRICS">Pediatrics</option>
+          <option value="GENERAL_MEDICINE" selected>General Medicine</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="book-doctor-select">Attending Physician</label>
+        <select id="book-doctor-select" class="select-field" required>
+          <!-- Options populated from doctorService -->
+        </select>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+        <div class="form-group">
+          <label for="book-date">Date</label>
+          <input type="date" id="book-date" class="input-field" required>
+        </div>
+        <div class="form-group">
+          <label for="book-time">Time</label>
+          <input type="time" id="book-time" value="10:00" class="input-field" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="book-reason">Reason for Visit</label>
+        <input type="text" id="book-reason" class="input-field" value="Clinical Consultation" placeholder="e.g. Annual follow-up, Routine triage">
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" onclick="closeBookModal()">Cancel</button>
+        <button type="submit" class="btn btn-primary">Confirm & Book</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- SITE FOOTER -->
+  <footer class="site-footer">
+    <p>GhostQueue Healthcare Intelligence &copy; 2026. Built with Java 21, MongoDB Atlas Cloud Cluster &amp; Logistic Regression Predictive Analytics.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

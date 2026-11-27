@@ -46,7 +46,7 @@ public class DoctorLayoutController {
     @FXML
     public void initialize() {
         if (brandIconContainer != null) {
-            brandIconContainer.getChildren().setAll(IconHelper.createIcon("hospital", "#168C83", 1.2));
+            brandIconContainer.getChildren().setAll(IconHelper.createBrandLogo(0.95));
         }
 
         setupNavIcon(navOverview, "overview");

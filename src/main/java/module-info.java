@@ -6,6 +6,7 @@ module com.ghostqueue {
     requires java.sql;
     requires java.logging;
     requires java.net.http;
+    requires jdk.httpserver;
     requires org.mongodb.driver.sync.client;
     requires org.mongodb.bson;
     requires org.mongodb.driver.core;
@@ -19,6 +20,7 @@ module com.ghostqueue {
     opens com.ghostqueue.component to javafx.fxml;
     opens com.ghostqueue.supabase to javafx.base;
     opens com.ghostqueue.mongodb to javafx.base;
+    opens com.ghostqueue.mongodb.repository to javafx.base;
 
     exports com.ghostqueue;
     exports com.ghostqueue.controller;
@@ -34,4 +36,6 @@ module com.ghostqueue {
     exports com.ghostqueue.supabase;
     exports com.ghostqueue.repository.supabase;
     exports com.ghostqueue.mongodb;
+    exports com.ghostqueue.mongodb.repository;
+    exports com.ghostqueue.web;
 }

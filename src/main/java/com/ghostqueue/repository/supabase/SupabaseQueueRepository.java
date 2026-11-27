@@ -77,6 +77,11 @@ public class SupabaseQueueRepository implements QueueRepository {
     }
 
     @Override
+    public List<QueueEntry> findByPriority(QueuePriority priority) {
+        if (priority == null) return findAll();
+        return findAll().stream().filter(q -> q.getPriority() == priority).toList();
+    }
+
     public List<QueueEntry> findActiveByDepartment(Department department) {
         List<QueueEntry> all = findAll();
         List<QueueEntry> filtered = new ArrayList<>();
@@ -87,6 +92,11 @@ public class SupabaseQueueRepository implements QueueRepository {
             }
         }
         return filtered;
+    }
+
+    @Override
+    public List<QueueEntry> filter(String query, Department department, QueuePriority priority, QueueStatus status) {
+        return filter(query, department, null, priority, status);
     }
 
     @Override
@@ -187,7 +197,6 @@ public class SupabaseQueueRepository implements QueueRepository {
         }
     }
 
-    @Override
     public boolean existsById(String id) {
         return findById(id).isPresent();
     }

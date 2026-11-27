@@ -28,7 +28,7 @@
 
         <!-- FILTER & EXPORT TOOLBAR -->
         <VBox styleClass="card" spacing="12">
-            <HBox alignment="CENTER_LEFT" spacing="12" wrapText="true">
+            <HBox alignment="CENTER_LEFT" spacing="12">
                 <VBox spacing="2">
                     <Label text="From Date:" style="-fx-font-size: 11px; -fx-font-weight: 600; -fx-text-fill: #77838D;" />
                     <DatePicker fx:id="startDatePicker" prefWidth="145" promptText="Start Date" />

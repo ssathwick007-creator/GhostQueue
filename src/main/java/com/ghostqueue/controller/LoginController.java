@@ -40,7 +40,7 @@ public class LoginController {
     public void initialize() {
         // Setup hero brand and feature icons
         if (brandLogoContainer != null) {
-            brandLogoContainer.getChildren().setAll(IconHelper.createIcon("overview", "#168C83", 1.4));
+            brandLogoContainer.getChildren().setAll(IconHelper.createBrandLogo(1.15));
         }
         if (featAiIcon != null) {
             featAiIcon.getChildren().setAll(IconHelper.createIcon("prediction", "#21A69A", 1.0));

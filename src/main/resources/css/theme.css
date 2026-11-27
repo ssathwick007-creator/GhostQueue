@@ -25,7 +25,7 @@
    SIDEBAR
    -------------------------------------------------------------------------- */
 .sidebar {
-    -fx-background-color: #102636;
+    -fx-background-color: linear-gradient(to bottom, #0b131e, #101d2e);
     -fx-pref-width: 250px;
     -fx-min-width: 250px;
     -fx-max-width: 250px;
@@ -40,16 +40,16 @@
 
 .brand-title {
     -fx-font-size: 18px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 800;
     -fx-text-fill: #FFFFFF;
-    -fx-letter-spacing: 1.2px;
+    -fx-letter-spacing: 1.5px;
 }
 
 .brand-subtitle {
     -fx-font-size: 11px;
-    -fx-text-fill: #168C83;
-    -fx-font-weight: 600;
-    -fx-letter-spacing: 0.8px;
+    -fx-text-fill: #0ea5e9;
+    -fx-font-weight: 700;
+    -fx-letter-spacing: 0.9px;
 }
 
 .sidebar-nav-container {
@@ -69,28 +69,28 @@
 }
 
 .nav-button:hover {
-    -fx-background-color: #1E3547;
+    -fx-background-color: rgba(255, 255, 255, 0.07);
     -fx-text-fill: #FFFFFF;
 }
 
 .nav-button.active {
-    -fx-background-color: rgba(22, 140, 131, 0.22);
+    -fx-background-color: linear-gradient(to right, rgba(14, 165, 233, 0.22), rgba(16, 185, 129, 0.08));
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 600;
-    -fx-border-color: #168C83;
-    -fx-border-width: 0 0 0 3px;
+    -fx-border-color: #0ea5e9;
+    -fx-border-width: 0 0 0 3.5px;
     -fx-border-radius: 0 6px 6px 0;
 }
 
 .sidebar-footer {
     -fx-padding: 16px;
-    -fx-background-color: #12222F;
+    -fx-background-color: #0c1724;
     -fx-border-color: rgba(255, 255, 255, 0.08);
     -fx-border-width: 1px 0 0 0;
 }
 
 .user-avatar-circle {
-    -fx-background-color: #168C83;
+    -fx-background-color: linear-gradient(to bottom right, #0ea5e9, #10b981);
     -fx-background-radius: 20px;
     -fx-pref-width: 38px;
     -fx-pref-height: 38px;
@@ -202,28 +202,28 @@
    -------------------------------------------------------------------------- */
 .card {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #E4E9E8;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(32, 43, 53, 0.04), 8, 0, 0, 2);
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 22px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.05), 10, 0, 0, 2);
 }
 
 .card-header {
     -fx-padding: 0 0 14px 0;
-    -fx-border-color: #E4E9E8;
+    -fx-border-color: #E2E8F0;
     -fx-border-width: 0 0 1px 0;
 }
 
 .card-title {
     -fx-font-size: 15px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #202B35;
+    -fx-font-weight: 700;
+    -fx-text-fill: #1E293B;
 }
 
 .card-subtitle {
     -fx-font-size: 12px;
-    -fx-text-fill: #77838D;
+    -fx-text-fill: #64748B;
 }
 
 /* --------------------------------------------------------------------------
@@ -231,34 +231,34 @@
    -------------------------------------------------------------------------- */
 .stat-card {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #E4E9E8;
-    -fx-border-radius: 8px;
-    -fx-background-radius: 8px;
-    -fx-padding: 16px 18px;
-    -fx-effect: dropshadow(gaussian, rgba(32, 43, 53, 0.03), 6, 0, 0, 1);
+    -fx-border-color: #E2E8F0;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 18px 20px;
+    -fx-effect: dropshadow(gaussian, rgba(15, 23, 42, 0.04), 8, 0, 0, 2);
 }
 
 .stat-label {
-    -fx-font-size: 12px;
-    -fx-font-weight: 600;
-    -fx-text-fill: #77838D;
+    -fx-font-size: 11.5px;
+    -fx-font-weight: 700;
+    -fx-text-fill: #64748B;
     -fx-text-transform: uppercase;
-    -fx-letter-spacing: 0.5px;
+    -fx-letter-spacing: 0.6px;
 }
 
 .stat-value {
     -fx-font-size: 26px;
-    -fx-font-weight: 700;
-    -fx-text-fill: #202B35;
+    -fx-font-weight: 800;
+    -fx-text-fill: #0F172A;
 }
 
 .stat-subtext {
-    -fx-font-size: 11px;
-    -fx-text-fill: #77838D;
+    -fx-font-size: 11.5px;
+    -fx-text-fill: #64748B;
 }
 
 .stat-icon-box {
-    -fx-background-radius: 6px;
+    -fx-background-radius: 8px;
     -fx-pref-width: 42px;
     -fx-pref-height: 42px;
     -fx-min-width: 42px;
@@ -270,25 +270,27 @@
    BUTTONS
    -------------------------------------------------------------------------- */
 .btn-primary {
-    -fx-background-color: #168C83;
+    -fx-background-color: linear-gradient(to right, #0d9488, #0ea5e9);
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 600;
     -fx-font-size: 13px;
-    -fx-padding: 8px 16px;
-    -fx-background-radius: 6px;
+    -fx-padding: 9px 18px;
+    -fx-background-radius: 7px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(14, 165, 233, 0.35), 6, 0, 0, 2);
 }
 
 .btn-primary:hover {
-    -fx-background-color: #12726B;
+    -fx-background-color: linear-gradient(to right, #0f766e, #0284c7);
+    -fx-effect: dropshadow(gaussian, rgba(14, 165, 233, 0.5), 10, 0, 0, 3);
 }
 
 .btn-secondary {
     -fx-background-color: #FFFFFF;
-    -fx-border-color: #E4E9E8;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-text-fill: #202B35;
+    -fx-border-color: #CBD5E1;
+    -fx-border-radius: 7px;
+    -fx-background-radius: 7px;
+    -fx-text-fill: #1E293B;
     -fx-font-weight: 500;
     -fx-font-size: 13px;
     -fx-padding: 8px 16px;
@@ -296,36 +298,38 @@
 }
 
 .btn-secondary:hover {
-    -fx-background-color: #F5F6F4;
-    -fx-border-color: #CBD5E1;
+    -fx-background-color: #F8FAFC;
+    -fx-border-color: #94A3B8;
 }
 
 .btn-danger {
-    -fx-background-color: #C95F5F;
+    -fx-background-color: linear-gradient(to right, #e11d48, #f43f5e);
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 600;
     -fx-font-size: 12px;
-    -fx-padding: 6px 12px;
-    -fx-background-radius: 5px;
+    -fx-padding: 7px 14px;
+    -fx-background-radius: 6px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(225, 29, 72, 0.3), 5, 0, 0, 1);
 }
 
 .btn-danger:hover {
-    -fx-background-color: #B54E4E;
+    -fx-background-color: linear-gradient(to right, #be123c, #e11d48);
 }
 
 .btn-success {
-    -fx-background-color: #438B70;
+    -fx-background-color: linear-gradient(to right, #059669, #10b981);
     -fx-text-fill: #FFFFFF;
     -fx-font-weight: 600;
     -fx-font-size: 12px;
-    -fx-padding: 6px 12px;
-    -fx-background-radius: 5px;
+    -fx-padding: 7px 14px;
+    -fx-background-radius: 6px;
     -fx-cursor: hand;
+    -fx-effect: dropshadow(gaussian, rgba(16, 185, 129, 0.3), 5, 0, 0, 1);
 }
 
 .btn-success:hover {
-    -fx-background-color: #38765E;
+    -fx-background-color: linear-gradient(to right, #047857, #059669);
 }
 
 .btn-sm {
